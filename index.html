@@ -1,0 +1,2596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GetFit App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, orderBy, limit, updateDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA7h3xBXLb434Jf0F1ZxcZnkrXoySIHWVc",
+            authDomain: "getfit-31e8c.firebaseapp.com",
+            projectId: "getfit-31e8c",
+            storageBucket: "getfit-31e8c.firebasestorage.app",
+            messagingSenderId: "672703837611",
+            appId: "1:672703837611:web:914698ec2a808420baceee",
+            measurementId: "G-JCYL99LSGC"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Make available globally
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.firebaseSignIn = signInWithEmailAndPassword;
+        window.firebaseSignUp = createUserWithEmailAndPassword;
+        window.firebaseSignOut = signOut;
+        window.firebaseOnAuthStateChanged = onAuthStateChanged;
+        window.firestoreDoc = doc;
+        window.firestoreSetDoc = setDoc;
+        window.firestoreGetDoc = getDoc;
+        window.firestoreCollection = collection;
+        window.firestoreQuery = query;
+        window.firestoreWhere = where;
+        window.firestoreGetDocs = getDocs;
+        window.firestoreOrderBy = orderBy;
+        window.firestoreLimit = limit;
+        window.firestoreUpdateDoc = updateDoc;
+        window.firestoreTimestamp = Timestamp;
+    </script>
+    
+    <script type="module">
+        import { createIcons } from 'https://unpkg.com/lucide@latest?module';
+        window.createIcons = createIcons;
+    </script>
+    <style>
+        :root {
+            --color-primary: #0A0A0A;
+            --color-card: #1C1C1E;
+            --color-accent: #32D74B;
+            --color-accent-secondary: #00D9FF;
+            --color-accent-tertiary: #FF6B6B;
+            --color-text-light: #F2F2F7;
+            --color-text-muted: #8E8E93;
+            --gradient-primary: linear-gradient(135deg, #32D74B 0%, #00D9FF 100%);
+            --gradient-secondary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-tertiary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-dark: linear-gradient(135deg, #1f1c2c 0%, #928DAB 100%);
+        }
+        
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(10, 10, 10, 0.92), rgba(10, 10, 10, 0.92)),
+                url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&h=1080&fit=crop&auto=format');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Modern Gradient Cards */
+        .gradient-card {
+            background: linear-gradient(135deg, rgba(50, 215, 75, 0.1) 0%, rgba(0, 217, 255, 0.1) 100%);
+            border: 1px solid rgba(50, 215, 75, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .gradient-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(50, 215, 75, 0.15);
+            border-color: rgba(50, 215, 75, 0.4);
+        }
+        
+        /* Animated Gradient Background */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .animated-gradient {
+            background: linear-gradient(270deg, #32D74B, #00D9FF, #667eea, #f093fb);
+            background-size: 800% 800%;
+            animation: gradientShift 15s ease infinite;
+        }
+        
+        /* Glass Morphism Effect */
+        .glass-card {
+            background: rgba(28, 28, 30, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        
+        /* Shimmer Effect */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+        
+        /* Progress Bar Animation */
+        .progress-bar {
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Pulse Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Stat Card with Gradient Border */
+        .stat-card {
+            position: relative;
+            background: var(--color-card);
+            border-radius: 1rem;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(50, 215, 75, 0.5), rgba(0, 217, 255, 0.5));
+            overflow: hidden;
+        }
+        
+        .stat-card-inner {
+            background: var(--color-card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card-inner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(50, 215, 75, 0.1), transparent);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+        }
+        
+        /* Badge Styles */
+        .badge-glow {
+            box-shadow: 0 0 20px rgba(50, 215, 75, 0.5);
+        }
+        
+        /* Custom Scrollbar for main content */
+        main::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        main::-webkit-scrollbar-track {
+            background: rgba(28, 28, 30, 0.3);
+        }
+        
+        main::-webkit-scrollbar-thumb {
+            background: rgba(50, 215, 75, 0.5);
+            border-radius: 4px;
+        }
+        
+        main::-webkit-scrollbar-thumb:hover {
+            background: rgba(50, 215, 75, 0.7);
+        }
+        
+        /* Button Hover Effects */
+        .btn-primary {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            pointer-events: none;
+        }
+        
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem 1rem;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+        
+        /* Loading Skeleton */
+        @keyframes skeleton-loading {
+            0% { background-position: -200px 0; }
+            100% { background-position: calc(200px + 100%) 0; }
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #1C1C1E 0px, #2C2C2E 40px, #1C1C1E 80px);
+            background-size: 200px 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        
+        /* Custom Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+        
+        .toast {
+            min-width: 320px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: all;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .toast.success {
+            background: rgba(50, 215, 75, 0.15);
+            border: 1px solid rgba(50, 215, 75, 0.3);
+        }
+        
+        .toast.error {
+            background: rgba(255, 107, 107, 0.15);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+        
+        .toast.info {
+            background: rgba(0, 217, 255, 0.15);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+        
+        .toast.warning {
+            background: rgba(255, 159, 10, 0.15);
+            border: 1px solid rgba(255, 159, 10, 0.3);
+        }
+        
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        
+        .toast-content {
+            flex: 1;
+        }
+        
+        .toast-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        
+        .toast-message {
+            font-size: 13px;
+            color: rgba(242, 242, 247, 0.8);
+        }
+        
+        .toast-close {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            padding: 4px;
+        }
+        
+        .toast-close:hover {
+            opacity: 1;
+        }
+        
+        /* Custom Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal {
+            background: rgba(28, 28, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+        
+        .modal-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-icon.success {
+            background: rgba(50, 215, 75, 0.2);
+        }
+        
+        .modal-icon.error {
+            background: rgba(255, 107, 107, 0.2);
+        }
+        
+        .modal-icon.info {
+            background: rgba(0, 217, 255, 0.2);
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        
+        .modal-message {
+            text-align: center;
+            color: rgba(242, 242, 247, 0.8);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .modal-button {
+            flex: 1;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .modal-button.primary {
+            background: var(--color-accent);
+            color: black;
+        }
+        
+        .modal-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(50, 215, 75, 0.3);
+        }
+        
+        .modal-button.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .modal-button.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        /* Scrollable response area */
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #32D74B 0%, #00D9FF 100%);
+            border-radius: 10px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #28a93e 0%, #00b8d9 100%);
+        }
+        
+        /* Smooth scrolling */
+        .overflow-y-auto {
+            scroll-behavior: smooth;
+        }
+        
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        /* Confetti particle styles */
+        .confetti-particle {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            z-index: 10000;
+            pointer-events: none;
+            animation: confetti 3s ease-out forwards;
+        }
+        
+        /* Goal completion celebration */
+        .goal-celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 3rem;
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            animation: celebrationPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        @keyframes celebrationPop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        .goal-completed-checkmark {
+            display: inline-block;
+            background: linear-gradient(135deg, #32D74B 0%, #00D9FF 100%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-left: 8px;
+            position: relative;
+        }
+        
+        .goal-completed-checkmark::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        /* Loading Spinner Animation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+    
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal" id="modal">
+            <div id="modal-content"></div>
+        </div>
+    </div>
+    
+    <!-- App Container with Sidebar -->
+    <div class="flex h-screen">
+        <!-- Permanent Sidebar -->
+        <aside id="sidebar" class="w-64 h-full fixed left-0 top-0 shadow-2xl z-50 overflow-y-auto glass-card hidden" style="background: rgba(17, 17, 17, 0.95); backdrop-filter: blur(20px);">
+            <div class="p-6 h-full flex flex-col justify-between">
+                <div>
+                    <!-- Logo & Brand -->
+                    <div class="mb-8 text-center">
+                        <div class="w-16 h-16 mx-auto mb-3 rounded-2xl flex items-center justify-center animated-gradient">
+                            <i data-lucide="zap" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <h1 class="text-2xl font-black tracking-tight">GetFit</h1>
+                        <p class="text-xs text-gray-400 mt-1">Your Fitness Journey</p>
+                    </div>
+                    
+                    <!-- User Profile Card -->
+                    <div class="mb-8 p-4 rounded-xl glass-card">
+                        <div class="flex items-center">
+                            <div class="relative">
+                                <img id="user-avatar" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&auto=format" alt="User Avatar" class="w-12 h-12 rounded-full border-2 border-green-500">
+                                <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900 pulse-animation"></div>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <p id="user-name" class="font-bold text-sm">Guest</p>
+                                <p class="text-xs flex items-center" style="color: var(--color-accent);">
+                                    <i data-lucide="crown" class="w-3 h-3 mr-1"></i>
+                                    Pro Member
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Stats -->
+                        <div class="grid grid-cols-3 gap-2 mt-4 text-center">
+                            <div>
+                                <p class="text-xs text-gray-400">Workouts</p>
+                                <p class="text-sm font-bold text-green-400">24</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400">Streak</p>
+                                <p class="text-sm font-bold text-orange-400">7d</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400">Level</p>
+                                <p class="text-sm font-bold text-blue-400">12</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <nav class="space-y-1">
+                        <a href="#" class="flex items-center p-3 rounded-xl hover:bg-gray-700/50 transition-all group" onclick="showView('dashboard')">
+                            <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center mr-3 group-hover:bg-green-500/20 transition-all">
+                                <i data-lucide="home" class="w-5 h-5 text-green-500"></i>
+                            </div>
+                            <span class="font-medium">Dashboard</span>
+                        </a>
+                        <a href="#" class="flex items-center p-3 rounded-xl hover:bg-gray-700/50 transition-all group" onclick="showView('workout')">
+                            <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mr-3 group-hover:bg-blue-500/20 transition-all">
+                                <i data-lucide="dumbbell" class="w-5 h-5 text-blue-500"></i>
+                            </div>
+                            <span class="font-medium">Workouts</span>
+                        </a>
+                        <a href="#" class="flex items-center p-3 rounded-xl hover:bg-gray-700/50 transition-all group" onclick="showView('nutrition')">
+                            <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center mr-3 group-hover:bg-orange-500/20 transition-all">
+                                <i data-lucide="utensils" class="w-5 h-5 text-orange-500"></i>
+                            </div>
+                            <span class="font-medium">Nutrition</span>
+                        </a>
+                        <a href="#" class="flex items-center p-3 rounded-xl hover:bg-gray-700/50 transition-all group" onclick="showView('health')">
+                            <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center mr-3 group-hover:bg-red-500/20 transition-all">
+                                <i data-lucide="heart-pulse" class="w-5 h-5 text-red-500"></i>
+                            </div>
+                            <span class="font-medium">Health</span>
+                        </a>
+                        <a href="#" class="flex items-center p-3 rounded-xl hover:bg-gray-700/50 transition-all group" onclick="showView('social')">
+                            <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mr-3 group-hover:bg-purple-500/20 transition-all">
+                                <i data-lucide="users" class="w-5 h-5 text-purple-500"></i>
+                            </div>
+                            <span class="font-medium">Social</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="space-y-1">
+                    <a href="#" class="flex items-center p-3 rounded-xl hover:bg-gray-700/50 transition-all group" onclick="showView('settings')">
+                        <div class="w-10 h-10 rounded-lg bg-gray-500/10 flex items-center justify-center mr-3 group-hover:bg-gray-500/20 transition-all">
+                            <i data-lucide="settings" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                        <span class="font-medium">Settings</span>
+                    </a>
+                    <a href="#" class="flex items-center p-3 rounded-xl hover:bg-red-500/10 transition-all group text-red-400" onclick="logout()">
+                        <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center mr-3 group-hover:bg-red-500/20 transition-all">
+                            <i data-lucide="log-out" class="w-5 h-5"></i>
+                        </div>
+                        <span class="font-medium">Log Out</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="flex-1 p-6 overflow-y-auto transition-all duration-300" style="background: rgba(10, 10, 10, 0.3); backdrop-filter: blur(5px);">
+            <!-- Login View -->
+            <div id="login-view" class="max-w-md mx-auto mt-20">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 mx-auto mb-4 rounded-2xl flex items-center justify-center animated-gradient">
+                        <i data-lucide="zap" class="w-10 h-10 text-white"></i>
+                    </div>
+                    <h1 class="text-4xl font-extrabold">GetFit</h1>
+                    <p class="text-gray-400 mt-2">Your Fitness Journey Starts Here</p>
+                </div>
+                
+                <div class="p-6 rounded-xl glass-card" style="background-color: var(--color-card);">
+                    <h2 class="text-2xl font-bold mb-2 text-center">Welcome Back</h2>
+                    <p class="text-sm text-gray-400 text-center mb-6">Sign in to continue your fitness journey</p>
+                    
+                    <form onsubmit="handleLogin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Email</label>
+                            <input type="email" required placeholder="your.email@example.com" class="w-full px-4 py-3 rounded-lg border border-gray-700 text-white focus:border-green-500 focus:outline-none transition" style="background-color: var(--color-primary);">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Password</label>
+                            <input type="password" required placeholder="••••••••" minlength="6" class="w-full px-4 py-3 rounded-lg border border-gray-700 text-white focus:border-green-500 focus:outline-none transition" style="background-color: var(--color-primary);">
+                        </div>
+                        
+                        <button type="submit" class="btn-primary w-full py-3 rounded-lg text-black font-bold text-lg hover:shadow-lg transition" style="background-color: var(--color-accent);">
+                            Log In
+                        </button>
+                    </form>
+                    
+                    <div class="mt-6 p-4 rounded-lg" style="background-color: rgba(50, 215, 75, 0.1); border: 1px solid rgba(50, 215, 75, 0.2);">
+                        <p class="text-sm text-center" style="color: var(--color-accent);">
+                            <i data-lucide="info" class="w-4 h-4 inline mr-1"></i>
+                            <strong>New here?</strong> Create an account to get started!
+                        </p>
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <p class="text-gray-400">Don't have an account? 
+                            <a href="#" onclick="showView('signup')" class="font-semibold hover:underline" style="color: var(--color-accent);">Sign Up Free →</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signup View -->
+            <div id="signup-view" class="max-w-md mx-auto mt-20 hidden">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 mx-auto mb-4 rounded-2xl flex items-center justify-center animated-gradient">
+                        <i data-lucide="zap" class="w-10 h-10 text-white"></i>
+                    </div>
+                    <h1 class="text-4xl font-extrabold">GetFit</h1>
+                    <p class="text-gray-400 mt-2">Join thousands achieving their fitness goals</p>
+                </div>
+                
+                <div class="p-6 rounded-xl glass-card" style="background-color: var(--color-card);">
+                    <h2 class="text-2xl font-bold mb-2 text-center">Create Account</h2>
+                    <p class="text-sm text-gray-400 text-center mb-6">Start your fitness journey today - it's free!</p>
+                    
+                    <form onsubmit="handleSignup(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Full Name</label>
+                            <input type="text" id="signup-name" required placeholder="John Doe" class="w-full px-4 py-3 rounded-lg border border-gray-700 text-white focus:border-green-500 focus:outline-none transition" style="background-color: var(--color-primary);">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Email</label>
+                            <input type="email" required placeholder="your.email@example.com" class="w-full px-4 py-3 rounded-lg border border-gray-700 text-white focus:border-green-500 focus:outline-none transition" style="background-color: var(--color-primary);">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Password</label>
+                            <input type="password" required minlength="6" placeholder="At least 6 characters" class="w-full px-4 py-3 rounded-lg border border-gray-700 text-white focus:border-green-500 focus:outline-none transition" style="background-color: var(--color-primary);">
+                            <p class="text-xs text-gray-500 mt-1">Must be at least 6 characters long</p>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary w-full py-3 rounded-lg text-black font-bold text-lg hover:shadow-lg transition" style="background-color: var(--color-accent);">
+                            Create Account
+                        </button>
+                    </form>
+                    
+                    <div class="mt-6 text-center">
+                        <p class="text-gray-400">Already have an account? 
+                            <a href="#" onclick="showView('login')" class="font-semibold hover:underline" style="color: var(--color-accent);">Log In →</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="hidden">
+                <!-- Header with Greeting -->
+                <div class="mb-8">
+                    <h1 class="text-4xl font-black mb-2">
+                        Welcome back, <span id="dashboard-name" class="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">User</span>! 👋
+                    </h1>
+                    <p class="text-gray-400">Let's crush your fitness goals today</p>
+                </div>
+
+                <!-- Stats Overview Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div class="stat-card cursor-pointer" onclick="showCaloriesDetail()">
+                        <div class="stat-card-inner">
+                            <div class="relative z-10">
+                                <div class="flex items-center justify-between mb-2">
+                                    <i data-lucide="flame" class="w-8 h-8 text-orange-500"></i>
+                                    <span class="text-xs text-gray-400 bg-orange-500/10 px-2 py-1 rounded-full">Today</span>
+                                </div>
+                                <p class="text-3xl font-black" data-stat="calories">0</p>
+                                <p class="text-sm text-gray-400 mt-1">Calories Burned</p>
+                                <div class="mt-3 flex items-center text-xs text-green-400">
+                                    <i data-lucide="trending-up" class="w-3 h-3 mr-1"></i>
+                                    <span>Track your progress</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card cursor-pointer" onclick="showStepsDetail()">
+                        <div class="stat-card-inner">
+                            <div class="relative z-10">
+                                <div class="flex items-center justify-between mb-2">
+                                    <i data-lucide="activity" class="w-8 h-8 text-blue-500"></i>
+                                    <span class="text-xs text-gray-400 bg-blue-500/10 px-2 py-1 rounded-full">Goal</span>
+                                </div>
+                                <p class="text-3xl font-black" data-stat="steps">0</p>
+                                <p class="text-sm text-gray-400 mt-1">Steps</p>
+                                <div class="mt-3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-blue-500 to-cyan-500 progress-bar" data-stat="steps-progress" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card cursor-pointer" onclick="showWorkoutsDetail()">
+                        <div class="stat-card-inner">
+                            <div class="relative z-10">
+                                <div class="flex items-center justify-between mb-2">
+                                    <i data-lucide="zap" class="w-8 h-8 text-yellow-500"></i>
+                                    <span class="text-xs text-gray-400 bg-yellow-500/10 px-2 py-1 rounded-full">Total</span>
+                                </div>
+                                <p class="text-3xl font-black" data-stat="workouts">0</p>
+                                <p class="text-sm text-gray-400 mt-1">Workouts Done</p>
+                                <div class="mt-3 flex items-center text-xs text-yellow-400">
+                                    <i data-lucide="award" class="w-3 h-3 mr-1"></i>
+                                    <span>Start working out!</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card cursor-pointer" onclick="showStreakDetail()">
+                        <div class="stat-card-inner">
+                            <div class="relative z-10">
+                                <div class="flex items-center justify-between mb-2">
+                                    <i data-lucide="target" class="w-8 h-8 text-purple-500"></i>
+                                    <span class="text-xs text-gray-400 bg-purple-500/10 px-2 py-1 rounded-full">Streak</span>
+                                </div>
+                                <p class="text-3xl font-black" data-stat="streak">0</p>
+                                <p class="text-sm text-gray-400 mt-1">Days Active</p>
+                                <div class="mt-3 flex items-center text-xs text-purple-400">
+                                    <i data-lucide="fire" class="w-3 h-3 mr-1"></i>
+                                    <span>Keep it going!</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Coach Card - Enhanced -->
+                <div class="gradient-card p-6 rounded-2xl mb-8 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-green-500/20 to-transparent rounded-full blur-3xl"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="w-14 h-14 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center mr-4 float-animation">
+                                    <i data-lucide="sparkles" class="w-7 h-7 text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold">AI Coach Francine</h3>
+                                    <p class="text-sm text-gray-400">Your Personal Fitness Assistant</p>
+                                </div>
+                            </div>
+                            <span class="badge-glow px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-green-400 to-blue-500">Online</span>
+                        </div>
+                        <div class="glass-card p-4 rounded-xl mb-4">
+                            <p class="text-sm leading-relaxed">
+                                "🎯 Great work! Your consistency this week is impressive! I'm here to answer any fitness or nutrition questions you have. Just ask!"
+                            </p>
+                        </div>
+                        <button onclick="askFrancine()" class="btn-primary px-6 py-3 rounded-xl font-semibold text-black flex items-center hover:scale-105 transition" style="background: linear-gradient(135deg, #32D74B 0%, #00D9FF 100%);">
+                            <i data-lucide="message-circle" class="w-4 h-4 mr-2"></i>
+                            Ask Francine a Question
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Daily Goals Grid -->
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                    <i data-lucide="target" class="w-6 h-6 mr-2 text-green-500"></i>
+                    Today's Goals
+                    <span id="goals-completed-indicator" class="ml-auto text-sm"></span>
+                    <button onclick="testCelebration()" class="ml-3 px-3 py-1 rounded-lg text-xs bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition" title="Test the celebration">
+                        🎉 Test
+                    </button>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div id="goal-water" class="glass-card p-6 rounded-2xl hover:scale-105 transition-transform">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                                <i data-lucide="droplets" class="w-6 h-6 text-blue-400"></i>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-2xl font-bold"><span id="water-current">1.5</span>L</p>
+                                <p class="text-xs text-gray-400">of <span id="water-goal">2.5</span>L</p>
+                            </div>
+                        </div>
+                        <h3 class="font-semibold mb-3 flex items-center">
+                            Water Intake
+                            <span id="water-checkmark"></span>
+                        </h3>
+                        <div class="mb-3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                            <div id="water-progress" class="h-full bg-gradient-to-r from-blue-400 to-cyan-400 progress-bar" style="width: 60%"></div>
+                        </div>
+                        <button onclick="addWater()" class="btn-primary w-full py-3 rounded-xl text-black font-semibold" style="background-color: var(--color-accent);">
+                            <i data-lucide="plus" class="w-4 h-4 inline mr-2"></i>
+                            Add 250ml
+                        </button>
+                    </div>
+
+                    <div id="goal-sleep" class="glass-card p-6 rounded-2xl hover:scale-105 transition-transform">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                                <i data-lucide="moon" class="w-6 h-6 text-purple-400"></i>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-2xl font-bold"><span id="sleep-current">7</span>h <span id="sleep-minutes">30</span>m</p>
+                                <p class="text-xs text-gray-400">last night</p>
+                            </div>
+                        </div>
+                        <h3 class="font-semibold mb-3 flex items-center">
+                            Sleep Quality
+                            <span id="sleep-checkmark"></span>
+                        </h3>
+                        <div class="mb-3 flex items-center">
+                            <span class="text-sm text-gray-400 mr-2">Quality:</span>
+                            <div class="flex" id="sleep-stars">
+                                <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                                <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                                <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                                <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                                <i data-lucide="star" class="w-4 h-4 text-gray-600"></i>
+                            </div>
+                        </div>
+                        <button onclick="logSleep()" class="btn-primary w-full py-3 rounded-xl text-black font-semibold" style="background-color: var(--color-accent);">
+                            <i data-lucide="edit" class="w-4 h-4 inline mr-2"></i>
+                            Log Sleep
+                        </button>
+                    </div>
+
+                    <div id="goal-steps" class="glass-card p-6 rounded-2xl hover:scale-105 transition-transform">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
+                                <i data-lucide="footprints" class="w-6 h-6 text-green-400"></i>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-2xl font-bold"><span id="steps-current">0</span></p>
+                                <p class="text-xs text-gray-400">of <span id="steps-goal">10,000</span></p>
+                            </div>
+                        </div>
+                        <h3 class="font-semibold mb-3 flex items-center">
+                            Steps Today
+                            <span id="steps-checkmark"></span>
+                        </h3>
+                        <div class="mb-3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                            <div id="steps-goal-progress" class="h-full bg-gradient-to-r from-green-400 to-emerald-400 progress-bar" style="width: 0%"></div>
+                        </div>
+                        <button onclick="showView('health')" class="btn-primary w-full py-3 rounded-xl text-black font-semibold" style="background-color: var(--color-accent);">
+                            <i data-lucide="trending-up" class="w-4 h-4 inline mr-2"></i>
+                            View Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Action Shortcuts -->
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                    <i data-lucide="zap" class="w-6 h-6 mr-2 text-yellow-500"></i>
+                    Quick Actions
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button onclick="showView('workout')" class="glass-card p-6 rounded-2xl hover:scale-105 transition-all text-center">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="dumbbell" class="w-7 h-7 text-blue-400"></i>
+                        </div>
+                        <p class="font-semibold">Start Workout</p>
+                    </button>
+                    
+                    <button onclick="showView('nutrition')" class="glass-card p-6 rounded-2xl hover:scale-105 transition-all text-center">
+                        <div class="w-14 h-14 rounded-2xl bg-orange-500/20 flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="utensils" class="w-7 h-7 text-orange-400"></i>
+                        </div>
+                        <p class="font-semibold">Log Meal</p>
+                    </button>
+                    
+                    <button onclick="showView('social')" class="glass-card p-6 rounded-2xl hover:scale-105 transition-all text-center">
+                        <div class="w-14 h-14 rounded-2xl bg-purple-500/20 flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="users" class="w-7 h-7 text-purple-400"></i>
+                        </div>
+                        <p class="font-semibold">Find Friends</p>
+                    </button>
+                    
+                    <button onclick="showView('health')" class="glass-card p-6 rounded-2xl hover:scale-105 transition-all text-center">
+                        <div class="w-14 h-14 rounded-2xl bg-red-500/20 flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="heart-pulse" class="w-7 h-7 text-red-400"></i>
+                        </div>
+                        <p class="font-semibold">Health Stats</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Workout View -->
+            <div id="workout-view" class="hidden">
+                <h1 class="text-2xl font-bold mb-6">Workout Library</h1>
+
+                <div class="flex space-x-4 mb-6 border-b border-gray-700">
+                    <button onclick="setWorkoutTab('library')" class="workout-tab px-4 py-2 font-semibold border-b-2 border-green-500" style="color: var(--color-accent);">Library</button>
+                    <button onclick="setWorkoutTab('my-routines')" class="workout-tab px-4 py-2 font-semibold text-gray-400">My Routines</button>
+                    <button onclick="setWorkoutTab('history')" class="workout-tab px-4 py-2 font-semibold text-gray-400">History</button>
+                </div>
+
+                <!-- Library Tab -->
+                <div id="workout-library-tab">
+                    <!-- Browse Categories Section -->
+                    <h2 class="text-xl font-bold mb-4">Browse Categories</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div onclick="filterWorkouts('Strength')" class="p-6 rounded-xl cursor-pointer hover:scale-105 transition" style="background-color: var(--color-card);">
+                            <div class="flex items-center mb-2">
+                                <i data-lucide="dumbbell" class="w-6 h-6 mr-2" style="color: var(--color-accent);"></i>
+                                <h3 class="font-bold text-lg">Strength Training</h3>
+                            </div>
+                            <p class="text-sm text-gray-400">30+ full routines available</p>
+                            <p class="text-xs text-gray-500 mt-1">Build muscle & power</p>
+                        </div>
+                        
+                        <div onclick="filterWorkouts('Cardio')" class="p-6 rounded-xl cursor-pointer hover:scale-105 transition" style="background-color: var(--color-card);">
+                            <div class="flex items-center mb-2">
+                                <i data-lucide="flame" class="w-6 h-6 mr-2 text-orange-400"></i>
+                                <h3 class="font-bold text-lg">Cardio & HIIT</h3>
+                            </div>
+                            <p class="text-sm text-gray-400">18 fat-burning sessions</p>
+                            <p class="text-xs text-gray-500 mt-1">Burn calories fast</p>
+                        </div>
+                        
+                        <div onclick="filterWorkouts('Yoga')" class="p-6 rounded-xl cursor-pointer hover:scale-105 transition" style="background-color: var(--color-card);">
+                            <div class="flex items-center mb-2">
+                                <i data-lucide="wind" class="w-6 h-6 mr-2 text-blue-400"></i>
+                                <h3 class="font-bold text-lg">Recovery & Stretch</h3>
+                            </div>
+                            <p class="text-sm text-gray-400">Focus on flexibility and core</p>
+                            <p class="text-xs text-gray-500 mt-1">Rest & recover</p>
+                        </div>
+                    </div>
+
+                    <!-- Filter Tabs -->
+                    <h2 class="text-xl font-bold mb-4">All Workouts</h2>
+                    <div class="flex space-x-2 mb-6 overflow-x-auto scrollbar-hide">
+                        <button onclick="filterWorkouts('All')" class="workout-filter px-4 py-2 rounded-full text-black font-semibold" style="background-color: var(--color-accent);">All</button>
+                        <button onclick="filterWorkouts('Beginner')" class="workout-filter px-4 py-2 rounded-full border border-gray-500 text-gray-300">Beginner</button>
+                        <button onclick="filterWorkouts('Intermediate')" class="workout-filter px-4 py-2 rounded-full border border-gray-500 text-gray-300">Intermediate</button>
+                        <button onclick="filterWorkouts('Advanced')" class="workout-filter px-4 py-2 rounded-full border border-gray-500 text-gray-300">Advanced</button>
+                        <button onclick="filterWorkouts('Strength')" class="workout-filter px-4 py-2 rounded-full border border-gray-500 text-gray-300">Strength</button>
+                        <button onclick="filterWorkouts('Yoga')" class="workout-filter px-4 py-2 rounded-full border border-gray-500 text-gray-300">Yoga</button>
+                        <button onclick="filterWorkouts('Cardio')" class="workout-filter px-4 py-2 rounded-full border border-gray-500 text-gray-300">Cardio</button>
+                    </div>
+
+                    <div id="workout-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Workouts will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- My Routines Tab -->
+                <div id="workout-routines-tab" class="hidden">
+                    <div class="mb-4">
+                        <button onclick="createNewRoutine()" class="px-6 py-2 rounded-lg text-black font-semibold" style="background-color: var(--color-accent);">
+                            + Create New Routine
+                        </button>
+                    </div>
+                    <div id="routines-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Routines will be populated here -->
+                    </div>
+                </div>
+
+                <!-- History Tab -->
+                <div id="workout-history-tab" class="hidden">
+                    <div id="history-list" class="space-y-4">
+                        <!-- History will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nutrition View -->
+            <div id="nutrition-view" class="hidden">
+                <h1 class="text-2xl font-bold mb-6">Nutrition Tracker</h1>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="p-6 rounded-xl" style="background-color: var(--color-card);">
+                        <h2 class="text-xl font-bold mb-4">Today's Calories</h2>
+                        <p class="text-4xl font-bold">1,450 / 2,000</p>
+                        <div class="mt-4 bg-gray-700 h-2 rounded-full">
+                            <div class="h-2 rounded-full" style="width: 72.5%; background-color: var(--color-accent);"></div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-xl" style="background-color: var(--color-card);">
+                        <h2 class="text-xl font-bold mb-4">Macros</h2>
+                        <div class="space-y-2">
+                            <div><span class="text-yellow-400">Protein:</span> 85g / 120g</div>
+                            <div><span class="text-blue-400">Carbs:</span> 180g / 200g</div>
+                            <div><span class="text-red-400">Fats:</span> 45g / 60g</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-xl font-bold mb-4">Recent Meals</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="rounded-xl overflow-hidden" style="background-color: var(--color-card);">
+                        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop" alt="Breakfast" class="w-full h-32 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold">Avocado Toast</h3>
+                            <p class="text-sm text-gray-400">Breakfast • 350 cal</p>
+                        </div>
+                    </div>
+                    <div class="rounded-xl overflow-hidden" style="background-color: var(--color-card);">
+                        <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop" alt="Lunch" class="w-full h-32 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold">Caesar Salad</h3>
+                            <p class="text-sm text-gray-400">Lunch • 450 cal</p>
+                        </div>
+                    </div>
+                    <div class="rounded-xl overflow-hidden" style="background-color: var(--color-card);">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop" alt="Dinner" class="w-full h-32 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-semibold">Grilled Chicken</h3>
+                            <p class="text-sm text-gray-400">Dinner • 650 cal</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health View -->
+            <div id="health-view" class="hidden">
+                <h1 class="text-2xl font-bold mb-6">Health & Wellness</h1>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="p-6 rounded-xl text-center" style="background-color: var(--color-card);">
+                        <i data-lucide="heart-pulse" class="w-12 h-12 mx-auto mb-2 text-red-400"></i>
+                        <h3 class="font-semibold">Heart Rate</h3>
+                        <p class="text-3xl font-bold">72 bpm</p>
+                    </div>
+                    <div class="p-6 rounded-xl text-center" style="background-color: var(--color-card);">
+                        <i data-lucide="activity" class="w-12 h-12 mx-auto mb-2 text-orange-400"></i>
+                        <h3 class="font-semibold">Steps</h3>
+                        <p class="text-3xl font-bold">8,000</p>
+                    </div>
+                    <div class="p-6 rounded-xl text-center" style="background-color: var(--color-card);">
+                        <i data-lucide="moon" class="w-12 h-12 mx-auto mb-2 text-blue-400"></i>
+                        <h3 class="font-semibold">Sleep</h3>
+                        <p class="text-3xl font-bold">7h 30m</p>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-xl" style="background-color: var(--color-card);">
+                    <h2 class="text-xl font-bold mb-4">Weight Progress</h2>
+                    <p class="text-2xl font-bold mb-2">75.5 kg</p>
+                    <p class="text-sm text-gray-400">Goal: 72.0 kg</p>
+                    <button onclick="showModal('Update Weight ⚖️', 'Record your current weight to track your progress over time!', 'info')" class="mt-4 px-6 py-2 rounded-lg text-black font-semibold" style="background-color: var(--color-accent);">
+                        Update Weight
+                    </button>
+                </div>
+            </div>
+
+            <!-- Social View -->
+            <div id="social-view" class="hidden">
+                <h1 class="text-2xl font-bold mb-6">Social & Community</h1>
+
+                <!-- Add Friends Section -->
+                <div class="p-6 rounded-xl mb-6" style="background-color: var(--color-card);">
+                    <h2 class="text-xl font-bold mb-4">Add Friends</h2>
+                    <div class="flex gap-2">
+                        <input 
+                            type="text" 
+                            id="friend-search" 
+                            placeholder="Search by username or email..." 
+                            class="flex-1 px-4 py-2 rounded-lg border border-gray-700 text-white" 
+                            style="background-color: var(--color-primary);">
+                        <button onclick="searchFriends()" class="px-6 py-2 rounded-lg text-black font-semibold" style="background-color: var(--color-accent);">
+                            Search
+                        </button>
+                    </div>
+                    <div id="friend-search-results" class="mt-4 space-y-2"></div>
+                </div>
+
+                <!-- My Friends -->
+                <div class="p-6 rounded-xl mb-6" style="background-color: var(--color-card);">
+                    <h2 class="text-xl font-bold mb-4">My Friends (<span id="friends-count">0</span>)</h2>
+                    <div id="friends-list" class="space-y-3"></div>
+                </div>
+
+                <!-- Activity Feed -->
+                <h2 class="text-xl font-bold mb-4">Activity Feed</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-6 rounded-xl" style="background-color: var(--color-card);">
+                        <div class="flex items-center mb-4">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop" alt="Friend" class="w-12 h-12 rounded-full mr-3">
+                            <div>
+                                <h3 class="font-semibold">Francine Chirwa</h3>
+                                <p class="text-sm text-gray-400">Completed 5K run</p>
+                            </div>
+                        </div>
+                        <p class="text-sm">Just finished an amazing morning run! 🏃‍♀️</p>
+                        <div class="flex space-x-4 mt-4">
+                            <button onclick="likePost(this)" class="text-sm">❤️ 24</button>
+                            <button onclick="showToast('Coming Soon! 💬', 'Comments feature will be available soon!', 'info', 2500)" class="text-sm">💬 8</button>
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-xl" style="background-color: var(--color-card);">
+                        <h3 class="font-semibold mb-4">Active Challenges</h3>
+                        <div class="space-y-2">
+                            <div class="p-3 rounded-lg bg-gray-700">
+                                <h4 class="font-semibold">10K Steps Challenge</h4>
+                                <p class="text-sm text-gray-400">3 days left • 47 participants</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-gray-700">
+                                <h4 class="font-semibold">30 Day Yoga</h4>
+                                <p class="text-sm text-gray-400">12 days left • 32 participants</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="hidden">
+                <h1 class="text-2xl font-bold mb-6">Settings</h1>
+
+                <div class="space-y-4">
+                    <div class="p-6 rounded-xl" style="background-color: var(--color-card);">
+                        <h3 class="font-semibold mb-2">Account Settings</h3>
+                        <button onclick="showModal('Profile Editing 👤', 'Profile editing feature coming soon! You\'ll be able to update your info, avatar, and preferences.', 'info')" class="text-sm text-gray-400 hover:text-white">Edit Profile</button>
+                    </div>
+
+                    <div class="p-6 rounded-xl" style="background-color: var(--color-card);">
+                        <h3 class="font-semibold mb-2">Notifications</h3>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" checked>
+                            <span>Push Notifications</span>
+                        </label>
+                    </div>
+
+                    <div class="p-6 rounded-xl" style="background-color: var(--color-card);">
+                        <h3 class="font-semibold mb-2">Goals</h3>
+                        <p class="text-sm text-gray-400">Daily Steps Goal: <span class="font-semibold text-white">10,000</span></p>
+                        <button onclick="showModal('Edit Goals 🎯', 'Customize your daily fitness goals including steps, calories, water intake, and sleep targets!', 'info')" class="mt-2 text-sm" style="color: var(--color-accent);">Edit Goals</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ===== Toast Notification System =====
+        function showToast(title, message, type = 'success', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '<i data-lucide="check-circle" class="toast-icon" style="color: #32D74B;"></i>',
+                error: '<i data-lucide="x-circle" class="toast-icon" style="color: #FF6B6B;"></i>',
+                info: '<i data-lucide="info" class="toast-icon" style="color: #00D9FF;"></i>',
+                warning: '<i data-lucide="alert-triangle" class="toast-icon" style="color: #FF9F0A;"></i>'
+            };
+            
+            toast.innerHTML = `
+                ${icons[type] || icons.info}
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    ${message ? `<div class="toast-message">${message}</div>` : ''}
+                </div>
+                <div class="toast-close" onclick="this.parentElement.remove()">
+                    <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            setTimeout(() => window.createIcons?.(), 10);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Auto remove
+            if (duration > 0) {
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, duration);
+            }
+            
+            return toast;
+        }
+        
+        // ===== Modal System =====
+        function showModal(title, message, type = 'info', buttons = null) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('modal-overlay');
+                const modalContent = document.getElementById('modal-content');
+                
+                const icons = {
+                    success: '<i data-lucide="check-circle" style="width: 32px; height: 32px; color: #32D74B;"></i>',
+                    error: '<i data-lucide="x-circle" style="width: 32px; height: 32px; color: #FF6B6B;"></i>',
+                    info: '<i data-lucide="info" style="width: 32px; height: 32px; color: #00D9FF;"></i>',
+                    warning: '<i data-lucide="alert-triangle" style="width: 32px; height: 32px; color: #FF9F0A;"></i>'
+                };
+                
+                // Default buttons
+                if (!buttons) {
+                    buttons = [{
+                        text: 'Got it!',
+                        primary: true,
+                        action: () => resolve(true)
+                    }];
+                }
+                
+                const buttonsHtml = buttons.map((btn, index) => 
+                    `<button class="modal-button ${btn.primary ? 'primary' : 'secondary'}" onclick="modalButtonClick(${index})">${btn.text}</button>`
+                ).join('');
+                
+                modalContent.innerHTML = `
+                    <div class="modal-icon ${type}">
+                        ${icons[type] || icons.info}
+                    </div>
+                    <h2 class="modal-title">${title}</h2>
+                    <p class="modal-message">${message}</p>
+                    <div class="modal-buttons">
+                        ${buttonsHtml}
+                    </div>
+                `;
+                
+                // Store button actions
+                window.modalButtonActions = buttons.map(btn => btn.action);
+                
+                overlay.classList.add('show');
+                setTimeout(() => window.createIcons?.(), 10);
+                
+                // Close on overlay click
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) {
+                        closeModal();
+                        resolve(false);
+                    }
+                };
+            });
+        }
+        
+        function modalButtonClick(index) {
+            if (window.modalButtonActions && window.modalButtonActions[index]) {
+                window.modalButtonActions[index]();
+            }
+            closeModal();
+        }
+        
+        function closeModal() {
+            const overlay = document.getElementById('modal-overlay');
+            overlay.classList.remove('show');
+        }
+        
+        function showConfirm(title, message, confirmText = 'Confirm', cancelText = 'Cancel') {
+            return new Promise((resolve) => {
+                showModal(title, message, 'warning', [
+                    {
+                        text: cancelText,
+                        primary: false,
+                        action: () => resolve(false)
+                    },
+                    {
+                        text: confirmText,
+                        primary: true,
+                        action: () => resolve(true)
+                    }
+                ]);
+            });
+        }
+        
+        const workouts = [
+            // Beginner Workouts
+            {id: 1, name: 'Morning Yoga Flow', category: 'Yoga', level: 'Beginner', duration: 30, calories: 120, image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop'},
+            {id: 2, name: 'Evening Stretch', category: 'Yoga', level: 'Beginner', duration: 15, calories: 50, image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop'},
+            {id: 3, name: 'Light Cardio Walk', category: 'Cardio', level: 'Beginner', duration: 25, calories: 150, image: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=400&h=300&fit=crop'},
+            {id: 4, name: 'Gentle Body Weights', category: 'Strength', level: 'Beginner', duration: 20, calories: 130, image: 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=400&h=300&fit=crop'},
+            {id: 5, name: 'Beginner Core', category: 'Strength', level: 'Beginner', duration: 15, calories: 90, image: 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&h=300&fit=crop'},
+            {id: 6, name: 'Easy Jog', category: 'Cardio', level: 'Beginner', duration: 30, calories: 200, image: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?w=400&h=300&fit=crop'},
+            {id: 7, name: 'Yoga Basics', category: 'Yoga', level: 'Beginner', duration: 25, calories: 100, image: 'https://images.unsplash.com/photo-1508672019048-805c876b67e2?w=400&h=300&fit=crop'},
+            
+            // Intermediate Workouts
+            {id: 8, name: 'Full Body Blast', category: 'Strength', level: 'Intermediate', duration: 45, calories: 400, image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&h=300&fit=crop'},
+            {id: 9, name: 'Core Strength', category: 'Strength', level: 'Intermediate', duration: 25, calories: 180, image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop'},
+            {id: 10, name: 'Power Yoga', category: 'Yoga', level: 'Intermediate', duration: 40, calories: 220, image: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=400&h=300&fit=crop'},
+            {id: 11, name: 'Cardio Kickboxing', category: 'Cardio', level: 'Intermediate', duration: 35, calories: 350, image: 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=400&h=300&fit=crop'},
+            {id: 12, name: 'Upper Body Power', category: 'Strength', level: 'Intermediate', duration: 40, calories: 320, image: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop'},
+            {id: 13, name: 'Lower Body Burn', category: 'Strength', level: 'Intermediate', duration: 35, calories: 290, image: 'https://images.unsplash.com/photo-1434682881908-b43d0467b798?w=400&h=300&fit=crop'},
+            {id: 14, name: 'Interval Run', category: 'Cardio', level: 'Intermediate', duration: 30, calories: 320, image: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&h=300&fit=crop'},
+            {id: 15, name: 'Vinyasa Flow', category: 'Yoga', level: 'Intermediate', duration: 45, calories: 240, image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop'},
+            {id: 16, name: 'Cycling HIIT', category: 'Cardio', level: 'Intermediate', duration: 30, calories: 380, image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=400&h=300&fit=crop'},
+            
+            // Advanced Workouts
+            {id: 17, name: 'HIIT Cardio Burn', category: 'Cardio', level: 'Advanced', duration: 20, calories: 300, image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop'},
+            {id: 18, name: 'Beast Mode Strength', category: 'Strength', level: 'Advanced', duration: 60, calories: 550, image: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=400&h=300&fit=crop'},
+            {id: 19, name: 'Advanced Ashtanga', category: 'Yoga', level: 'Advanced', duration: 50, calories: 280, image: 'https://images.unsplash.com/photo-1552196563-55cd4e45efb3?w=400&h=300&fit=crop'},
+            {id: 20, name: 'Explosive Power', category: 'Strength', level: 'Advanced', duration: 50, calories: 480, image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=300&fit=crop'},
+            {id: 21, name: 'Tabata Extreme', category: 'Cardio', level: 'Advanced', duration: 25, calories: 400, image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop'},
+            {id: 22, name: 'Advanced Core', category: 'Strength', level: 'Advanced', duration: 30, calories: 250, image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop'},
+            {id: 23, name: 'Warrior Bootcamp', category: 'Cardio', level: 'Advanced', duration: 45, calories: 520, image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop'},
+            {id: 24, name: 'Hot Yoga Power', category: 'Yoga', level: 'Advanced', duration: 60, calories: 350, image: 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=400&h=300&fit=crop'},
+            {id: 25, name: 'Olympic Lifts', category: 'Strength', level: 'Advanced', duration: 55, calories: 500, image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop'},
+            
+            // More Cardio
+            {id: 26, name: 'Jump Rope Master', category: 'Cardio', level: 'Intermediate', duration: 20, calories: 280, image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop'},
+            {id: 27, name: 'Stair Climber', category: 'Cardio', level: 'Intermediate', duration: 25, calories: 300, image: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=300&fit=crop'},
+            {id: 28, name: 'Dance Cardio', category: 'Cardio', level: 'Beginner', duration: 30, calories: 220, image: 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=400&h=300&fit=crop'},
+            
+            // More Yoga
+            {id: 29, name: 'Yin Yoga Restore', category: 'Yoga', level: 'Beginner', duration: 45, calories: 110, image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop'},
+            {id: 30, name: 'Balance & Flexibility', category: 'Yoga', level: 'Intermediate', duration: 35, calories: 160, image: 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=400&h=300&fit=crop'},
+        ];
+
+        let currentFilter = 'All';
+        let userName = 'Guest';
+        let waterIntake = 1.5;
+        
+        // Daily Goals State
+        let dailyGoals = {
+            water: { current: 1.5, goal: 2.5, completed: false },
+            sleep: { current: 7.5, goal: 8, completed: false },
+            steps: { current: 0, goal: 10000, completed: false }
+        };
+        
+        let allGoalsCompletedToday = false;
+        let currentUser = null;
+        let userStats = {
+            caloriesBurned: 0,
+            steps: 0,
+            workoutsDone: 0,
+            activeStreak: 0
+        };
+        
+        // My Routines Data
+        const myRoutines = [
+            {id: 1, name: 'Morning Power Routine', workouts: ['Morning Yoga Flow', 'Core Strength'], duration: 55, created: '2 weeks ago'},
+            {id: 2, name: 'Evening Relax', workouts: ['Evening Stretch', 'Light Cardio Walk'], duration: 40, created: '1 week ago'},
+            {id: 3, name: 'Weekend Warrior', workouts: ['Full Body Blast', 'HIIT Cardio Burn'], duration: 65, created: '3 days ago'}
+        ];
+        
+        // Workout History Data
+        let workoutHistory = [
+            {name: 'Morning Yoga Flow', date: 'Today, 7:30 AM', duration: 30, calories: 120},
+            {name: 'HIIT Cardio Burn', date: 'Yesterday, 6:00 PM', duration: 20, calories: 300},
+            {name: 'Core Strength', date: '2 days ago, 8:00 AM', duration: 25, calories: 180},
+            {name: 'Power Yoga', date: '3 days ago, 7:00 AM', duration: 40, calories: 220},
+            {name: 'Beast Mode Strength', date: '4 days ago, 5:30 PM', duration: 60, calories: 550},
+            {name: 'Light Cardio Walk', date: '5 days ago, 9:00 AM', duration: 25, calories: 150}
+        ];
+        
+        // Friends Data
+        let friends = [];
+        const availableFriends = [
+            {id: 1, name: 'Sarah Johnson', username: 'sarahfit', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop', workouts: 147},
+            {id: 2, name: 'Mike Chen', username: 'mikestrong', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop', workouts: 203},
+            {id: 3, name: 'Emily Davis', username: 'emilyrun', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop', workouts: 189},
+            {id: 4, name: 'James Wilson', username: 'jamesgym', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop', workouts: 256},
+            {id: 5, name: 'Lisa Martinez', username: 'lisayoga', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop', workouts: 312}
+        ];
+
+        function showView(viewName) {
+            const views = ['login-view', 'signup-view', 'dashboard-view', 'workout-view', 'nutrition-view', 'health-view', 'social-view', 'settings-view'];
+            views.forEach(v => document.getElementById(v).classList.add('hidden'));
+            document.getElementById(viewName + '-view').classList.remove('hidden');
+            
+            // Show/hide sidebar based on view
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            if (viewName === 'login' || viewName === 'signup') {
+                sidebar.classList.add('hidden');
+                mainContent.classList.remove('ml-64');
+            } else {
+                sidebar.classList.remove('hidden');
+                mainContent.classList.add('ml-64');
+            }
+            
+            document.querySelectorAll('aside a').forEach(a => a.classList.remove('bg-gray-700/50'));
+            document.querySelector(`aside a[onclick="showView('${viewName}')"]`)?.classList.add('bg-gray-700/50');
+            
+            // Initialize view-specific content
+            if (viewName === 'social') {
+                displayFriends();
+            }
+            
+            setTimeout(() => window.createIcons?.(), 100);
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = e.target[0].value;
+            const password = e.target[1].value;
+            
+            if (!email || !password) {
+                showToast('Missing Information', 'Please enter both email and password', 'warning', 3000);
+                return;
+            }
+            
+            try {
+                const userCredential = await window.firebaseSignIn(window.firebaseAuth, email, password);
+                currentUser = userCredential.user;
+                
+                // Load user data from Firestore
+                await loadUserData(currentUser.uid);
+                
+                showToast('Login Successful! 🎉', `Welcome back, ${userName}! Time to crush your fitness goals today.`, 'success', 4000);
+                showView('dashboard');
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                // Provide user-friendly error messages
+                let errorMessage = 'Unable to log in';
+                let errorDetail = '';
+                
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                    errorMessage = 'Invalid Credentials';
+                    errorDetail = 'Email or password is incorrect. Don\'t have an account? Sign up first!';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Invalid Email';
+                    errorDetail = 'Please enter a valid email address';
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMessage = 'Too Many Attempts';
+                    errorDetail = 'Please try again later';
+                } else {
+                    errorDetail = error.message || 'Please check your credentials and try again';
+                }
+                
+                showModal(errorMessage, errorDetail, 'error');
+            }
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = e.target[1].value;
+            const password = e.target[2].value;
+            
+            // Validation
+            if (!name || !email || !password) {
+                showToast('Missing Information', 'Please fill in all fields', 'warning', 3000);
+                return;
+            }
+            
+            if (password.length < 6) {
+                showToast('Password Too Short', 'Password must be at least 6 characters', 'warning', 3000);
+                return;
+            }
+            
+            try {
+                const userCredential = await window.firebaseSignUp(window.firebaseAuth, email, password);
+                currentUser = userCredential.user;
+                
+                // Create user profile in Firestore
+                await createUserProfile(currentUser.uid, name, email);
+                
+                userName = name;
+                document.getElementById('user-name').textContent = userName;
+                document.getElementById('dashboard-name').textContent = userName;
+                
+                showModal('Welcome to GetFit! 🎉', `Hey ${userName}! Your fitness journey starts now. Let us make every workout count!`, 'success');
+                showView('dashboard');
+            } catch (error) {
+                console.error('Signup error:', error);
+                
+                let errorMessage = 'Signup Failed';
+                let errorDetail = '';
+                
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'Email Already Registered';
+                    errorDetail = 'This email is already in use. Try logging in instead!';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Invalid Email';
+                    errorDetail = 'Please enter a valid email address';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'Weak Password';
+                    errorDetail = 'Please use a stronger password (at least 6 characters)';
+                } else {
+                    errorDetail = error.message || 'Could not create account. Please try again.';
+                }
+                
+                showModal(errorMessage, errorDetail, 'error');
+            }
+        }
+        
+        // Create user profile in Firestore
+        async function createUserProfile(userId, displayName, email) {
+            const userRef = window.firestoreDoc(window.firebaseDb, 'users', userId);
+            const userData = {
+                id: userId,
+                displayName: displayName,
+                email: email,
+                createdAt: Date.now(),
+                stats: {
+                    totalWorkouts: 0,
+                    totalCalories: 0,
+                    currentStreak: 0,
+                    longestStreak: 0,
+                    totalSteps: 0
+                },
+                goals: {
+                    dailySteps: 10000,
+                    dailyCalories: 2500,
+                    weeklyWorkouts: 5,
+                    dailyWater: 2.5
+                }
+            };
+            
+            await window.firestoreSetDoc(userRef, userData);
+            userStats = userData.stats;
+        }
+        
+        // Load user data from Firestore
+        async function loadUserData(userId) {
+            try {
+                const userRef = window.firestoreDoc(window.firebaseDb, 'users', userId);
+                const userSnap = await window.firestoreGetDoc(userRef);
+                
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    userName = userData.displayName || 'User';
+                    userStats = userData.stats || {
+                        totalWorkouts: 0,
+                        totalCalories: 0,
+                        currentStreak: 0,
+                        totalSteps: 0
+                    };
+                    
+                    // Update UI
+                    document.getElementById('user-name').textContent = userName;
+                    document.getElementById('dashboard-name').textContent = userName;
+                    
+                    // Update dashboard stats
+                    updateDashboardStats();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+        
+        // Update dashboard statistics
+        function updateDashboardStats() {
+            // Update calories burned
+            document.querySelector('[data-stat="calories"]').textContent = userStats.totalCalories?.toLocaleString() || '0';
+            
+            // Update steps
+            const totalSteps = userStats.totalSteps || 0;
+            document.querySelector('[data-stat="steps"]').textContent = totalSteps.toLocaleString();
+            const stepsPercent = (totalSteps / 10000) * 100;
+            document.querySelector('[data-stat="steps-progress"]').style.width = `${Math.min(stepsPercent, 100)}%`;
+            
+            // Sync with daily goals
+            dailyGoals.steps.current = totalSteps;
+            
+            // Update workouts done
+            document.querySelector('[data-stat="workouts"]').textContent = userStats.totalWorkouts || '0';
+            
+            // Update active streak (Days Active)
+            document.querySelector('[data-stat="streak"]').textContent = userStats.currentStreak || '0';
+            
+            // Update goals UI
+            updateGoalsUI();
+        }
+
+        async function logout() {
+            const confirmed = await showConfirm('Logout', 'Are you sure you want to log out?', 'Yes, Log Out', 'Cancel');
+            if (confirmed) {
+                try {
+                    await window.firebaseSignOut(window.firebaseAuth);
+                    currentUser = null;
+                    userName = 'Guest';
+                    userStats = {caloriesBurned: 0, steps: 0, workoutsDone: 0, activeStreak: 0};
+                    document.getElementById('user-name').textContent = 'Guest';
+                    document.getElementById('dashboard-name').textContent = 'User';
+                    showToast('Logged Out', 'See you next time! Stay fit! 💪', 'info', 3000);
+                    showView('login');
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    showToast('Error', 'Failed to log out', 'error', 3000);
+                }
+            }
+        }
+
+        async function askFrancine() {
+            // Show input modal for user question
+            const overlay = document.getElementById('modal-overlay');
+            const modalContent = document.getElementById('modal-content');
+            
+            modalContent.innerHTML = `
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="modal-icon info" style="margin: 0; margin-right: 12px;">
+                            <i data-lucide="sparkles" style="width: 32px; height: 32px; color: #00D9FF;"></i>
+                        </div>
+                        <h2 class="modal-title" style="margin: 0;">Ask AI Coach Francine 🤖</h2>
+                    </div>
+                    <button onclick="closeModal()" class="p-2 hover:bg-gray-700 rounded-lg transition" title="Close">
+                        <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                    </button>
+                </div>
+                <p class="modal-message mb-4">What fitness or health question do you have today?</p>
+                <textarea 
+                    id="francine-question" 
+                    placeholder="e.g., How can I build muscle faster? What should I eat before a workout?" 
+                    class="w-full px-4 py-3 rounded-lg border border-gray-700 text-white mb-4 resize-none"
+                    style="background-color: var(--color-primary); min-height: 100px;"
+                    rows="4"
+                ></textarea>
+                <div class="modal-buttons">
+                    <button class="modal-button secondary" onclick="closeModal()">
+                        <i data-lucide="x" class="w-4 h-4 inline mr-2"></i>
+                        Cancel
+                    </button>
+                    <button class="modal-button primary" onclick="getFrancineResponse()">
+                        <i data-lucide="send" class="w-4 h-4 inline mr-2"></i>
+                        Ask Francine
+                    </button>
+                </div>
+            `;
+            
+            overlay.classList.add('show');
+            setTimeout(() => {
+                window.createIcons?.();
+                const questionInput = document.getElementById('francine-question');
+                questionInput.focus();
+                
+                // Add keyboard shortcuts
+                questionInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                        e.preventDefault();
+                        getFrancineResponse();
+                    }
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        closeModal();
+                    }
+                });
+            }, 100);
+        }
+        
+        async function getFrancineResponse() {
+            const questionInput = document.getElementById('francine-question');
+            const question = questionInput.value.trim();
+            
+            if (!question) {
+                showToast('Question Required', 'Please enter a question for Francine', 'warning', 2500);
+                return;
+            }
+            
+            // Show loading state
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <div class="modal-icon info">
+                    <i data-lucide="loader-2" class="animate-spin" style="width: 32px; height: 32px; color: #00D9FF;"></i>
+                </div>
+                <h2 class="modal-title">Francine is thinking... 🤔</h2>
+                <p class="modal-message">Getting you the best fitness advice!</p>
+            `;
+            setTimeout(() => window.createIcons?.(), 10);
+            
+            try {
+                // Get AI response
+                const response = await getAIResponse(question);
+                
+                // Show response with scrolling
+                modalContent.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="modal-icon success" style="margin: 0; margin-right: 12px;">
+                                <i data-lucide="sparkles" style="width: 32px; height: 32px; color: #32D74B;"></i>
+                            </div>
+                            <h2 class="modal-title" style="margin: 0;">Francine's Advice 💪</h2>
+                        </div>
+                        <button onclick="closeModal()" class="p-2 hover:bg-gray-700 rounded-lg transition" title="Close">
+                            <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                        </button>
+                    </div>
+                    <div class="text-left mb-4 p-4 rounded-lg overflow-y-auto" style="background-color: rgba(50, 215, 75, 0.1); border: 1px solid rgba(50, 215, 75, 0.2); max-height: 60vh;">
+                        <p class="text-sm text-gray-300 whitespace-pre-line">${response}</p>
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="modal-button secondary" onclick="askFrancine()">
+                            <i data-lucide="message-circle" class="w-4 h-4 inline mr-2"></i>
+                            Ask Another
+                        </button>
+                        <button class="modal-button primary" onclick="closeModal()">
+                            <i data-lucide="check" class="w-4 h-4 inline mr-2"></i>
+                            Got it!
+                        </button>
+                    </div>
+                `;
+                setTimeout(() => window.createIcons?.(), 10);
+                
+            } catch (error) {
+                console.error('Error getting AI response:', error);
+                
+                // Fallback to curated responses
+                const fallbackResponse = getFallbackResponse(question);
+                
+                modalContent.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="modal-icon info" style="margin: 0; margin-right: 12px;">
+                                <i data-lucide="sparkles" style="width: 32px; height: 32px; color: #00D9FF;"></i>
+                            </div>
+                            <h2 class="modal-title" style="margin: 0;">Francine's Advice 💪</h2>
+                        </div>
+                        <button onclick="closeModal()" class="p-2 hover:bg-gray-700 rounded-lg transition" title="Close">
+                            <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                        </button>
+                    </div>
+                    <div class="text-left mb-4 p-4 rounded-lg overflow-y-auto" style="background-color: rgba(50, 215, 75, 0.1); border: 1px solid rgba(50, 215, 75, 0.2); max-height: 60vh;">
+                        <p class="text-sm text-gray-300 whitespace-pre-line">${fallbackResponse}</p>
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="modal-button secondary" onclick="askFrancine()">
+                            <i data-lucide="message-circle" class="w-4 h-4 inline mr-2"></i>
+                            Ask Another
+                        </button>
+                        <button class="modal-button primary" onclick="closeModal()">
+                            <i data-lucide="check" class="w-4 h-4 inline mr-2"></i>
+                            Got it!
+                        </button>
+                    </div>
+                `;
+                setTimeout(() => window.createIcons?.(), 10);
+            }
+        }
+        
+        // AI-powered response function
+        async function getAIResponse(question) {
+            // Option 1: Using OpenAI API (requires API key)
+            // Uncomment and add your API key to use
+            /*
+            const apiKey = 'YOUR_OPENAI_API_KEY'; // Add your key here
+            
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'You are Francine, a professional fitness coach and nutritionist. Provide helpful, accurate, and motivating fitness and health advice. Keep responses concise (3-5 sentences) and actionable.'
+                        },
+                        {
+                            role: 'user',
+                            content: question
+                        }
+                    ],
+                    max_tokens: 200,
+                    temperature: 0.7
+                })
+            });
+            
+            const data = await response.json();
+            return data.choices[0].message.content;
+            */
+            
+            // Option 2: Using Hugging Face Inference API (Free alternative)
+            // For now, use smart fallback with enhanced responses
+            return getEnhancedResponse(question);
+        }
+        
+        // Enhanced response system with comprehensive keyword matching and varied responses
+        function getEnhancedResponse(question) {
+            const q = question.toLowerCase();
+            
+            // Muscle building - Multiple response variations
+            if (q.includes('muscle') || q.includes('bulk') || q.includes('gain weight') || q.includes('hypertrophy')) {
+                const responses = [
+                    "**Building Muscle: Complete Strategy**\n\n**Training Protocol:**\n• Progressive Overload: Add 2.5-5kg weekly or 1-2 reps per set\n• Volume: 10-20 sets per muscle group weekly\n• Rep Range: 6-12 reps for hypertrophy\n• Compound Movements: Squat, Deadlift, Bench, Pull-ups, Rows\n• Time Under Tension: 40-70 seconds per set\n\n**Nutrition:**\n• Caloric Surplus: +300-500 cal above maintenance\n• Protein: 1.6-2.2g per kg bodyweight (spread across 4-5 meals)\n• Carbs: 3-5g per kg (fuel for training)\n• Fats: 0.8-1g per kg (hormone production)\n\n**Recovery:**\n• Sleep: 7-9 hours (growth hormone peak)\n• Rest Days: 1-2 weekly\n• Deload Week: Every 4-6 weeks\n\n**Timeline:** Expect 0.25-0.5kg muscle gain monthly as a natural athlete. Stay patient!",
+                    
+                    "**Muscle Growth Blueprint**\n\n**Phase 1: Foundation (Weeks 1-4)**\n• Focus on form with lighter weights\n• Master compound movements\n• Build work capacity\n• Eat at slight surplus (+200 cal)\n\n**Phase 2: Growth (Weeks 5-12)**\n• Increase weights by 5% weekly\n• Add volume (sets/exercises)\n• Protein at 2g per kg minimum\n• Full surplus (+400 cal)\n\n**Phase 3: Peak (Weeks 13-16)**\n• Push intensity to 85-90% 1RM\n• Maintain volume\n• Optimize recovery\n\n**Pro Tips:**\n✓ Train each muscle 2-3x weekly\n✓ Use exercises you feel in target muscle\n✓ Track all lifts in a journal\n✓ Take progress photos every 2 weeks\n✓ Creatine monohydrate: 5g daily (proven effective)\n\nConsistency trumps perfection every time!",
+                    
+                    "**Advanced Muscle Building Tactics**\n\n**Training Techniques:**\n1. **Drop Sets**: Reduce weight by 20-30% after failure, continue\n2. **Supersets**: Pair antagonist muscles (biceps-triceps)\n3. **Tempo Training**: 3-1-1-1 (eccentric-pause-concentric-pause)\n4. **Mechanical Drop Sets**: Change exercise angle when fatigued\n\n**Meal Timing (Optional but helpful):**\n• Pre-workout (2hr): Carbs + moderate protein\n• Post-workout (within 2hr): Protein + carbs (2:1 ratio)\n• Before bed: Casein protein for overnight recovery\n\n**Supplement Stack (Evidence-based):**\n✓ Creatine: 5g daily (+2-5% strength)\n✓ Protein powder: Convenience, not necessity\n✓ Caffeine: 3-6mg/kg pre-workout\n✗ Skip: BCAAs (if eating enough protein), fat burners\n\n**Common Mistakes:**\n• Changing routines too frequently\n• Not tracking progressive overload\n• Under-eating protein\n• Overtraining (more ≠ better)\n\nBuild the foundation first, then optimize!"
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // Weight loss - Multiple detailed responses
+            if (q.includes('lose weight') || q.includes('fat loss') || q.includes('slim') || q.includes('cut') || q.includes('shred')) {
+                const responses = [
+                    "**Sustainable Fat Loss Strategy**\n\n**Nutrition Fundamentals:**\n• Caloric Deficit: -300 to -500 cal daily (not more!)\n• Protein: 1.8-2.2g per kg (preserves muscle)\n• Carbs: 2-3g per kg (energy for workouts)\n• Fats: 0.5-0.8g per kg (minimum for hormones)\n• Fiber: 25-35g daily (satiety)\n\n**Training Split:**\n• Strength Training: 3-4x weekly (maintain muscle)\n• Cardio: 2-3x weekly (150-200 cal sessions)\n• Daily Steps: 8,000-10,000 minimum (NEAT)\n\n**Weekly Targets:**\n• Fat Loss: 0.5-1% bodyweight weekly\n• Muscle Retention: Maintain strength on main lifts\n\n**Tracking:**\n• Weigh daily, take weekly average\n• Photos every 2 weeks (same lighting/time)\n• Measurements: waist, hips, thighs\n\n**Mental Game:**\n• Plan meals ahead\n• Allow 1-2 flexible meals weekly\n• Focus on habits, not perfection\n\nYou've got this! Small deficit = sustainable results.",
+                    
+                    "**Fat Loss: Advanced Protocol**\n\n**Calorie Cycling:**\n• High Days (training): Maintenance calories\n• Low Days (rest): -500 calories\n• Average deficit: -300 cal weekly\n• Benefits: Better performance, less hunger\n\n**Meal Structure:**\n• Meal 1 (Breakfast): Protein + fats (300 cal)\n• Meal 2 (Lunch): Protein + carbs + veg (450 cal)\n• Meal 3 (Pre-workout): Light carbs (150 cal)\n• Meal 4 (Dinner): Protein + veg + moderate carbs (500 cal)\n• Total: ~1,400-1,600 cal (adjust to your needs)\n\n**Cardio Strategy:**\n• Fasted morning walks: 30-45 min, low intensity\n• Post-workout HIIT: 15-20 min, 2x weekly\n• Daily steps: Non-negotiable 10K\n\n**Strength Training Priority:**\n• Keep weights heavy (relative to you)\n• Reduce volume slightly (not intensity)\n• Rest 2-3 min between main lifts\n\n**Hunger Management:**\n✓ Volume foods: Vegetables, fruits\n✓ Protein at every meal (most satiating)\n✓ Water: 3-4L daily\n✓ Coffee/tea: Appetite suppressant\n✓ Sleep: 7-9 hours (hunger hormones)\n\nFat loss is a marathon, not a sprint!",
+                    
+                    "**Complete Fat Loss Checklist**\n\n**Week 1-2: Assessment**\n□ Track current intake (no changes yet)\n□ Establish maintenance calories\n□ Take baseline photos/measurements\n□ Find current TDEE\n\n**Week 3-8: Fat Loss Phase**\n□ Create 400-500 cal deficit\n□ Protein: 2g per kg minimum\n□ Strength train 3-4x weekly\n□ Add 150 min cardio weekly\n□ Track weight daily (weekly average)\n□ Adjust every 2 weeks if needed\n\n**Week 9-10: Diet Break**\n□ Eat at maintenance for 10-14 days\n□ Maintain training intensity\n□ Reset hunger hormones\n□ Prepare mentally for next phase\n\n**Red Flags (Stop & Reassess):**\n⚠️ Losing >1.5% bodyweight weekly\n⚠️ Strength dropping >15% on main lifts\n⚠️ Energy levels extremely low\n⚠️ Sleep quality poor\n⚠️ Mood significantly affected\n\n**Success Markers:**\n✓ Consistent 0.5-1kg weekly loss\n✓ Maintaining strength\n✓ Good energy in workouts\n✓ Clothes fitting better\n\nPatience + consistency = results that last!"
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // Workout frequency - Detailed variations
+            if (q.includes('how often') || q.includes('frequency') || q.includes('how many days') || q.includes('train')) {
+                const responses = [
+                    "**Optimal Training Frequency by Goal**\n\n**Muscle Building:**\n• Beginners: 3-4 full body sessions\n• Intermediate: 4-5 upper/lower split\n• Advanced: 5-6 push/pull/legs\n\n**Fat Loss:**\n• 3-4 strength training sessions\n• 2-3 cardio sessions (separate days)\n• Daily: 10K steps minimum\n\n**General Fitness:**\n• 3-5 mixed sessions weekly\n• 2x strength, 2x cardio, 1x flexibility\n\n**Recovery Guidelines:**\n• Same muscle: 48-72 hours rest\n• Full body: 48 hours minimum\n• Heavy lifting: 72 hours between sessions\n• Active recovery: Daily walking, yoga\n\n**Weekly Template (Intermediate):**\n• Monday: Upper body\n• Tuesday: Cardio + core\n• Wednesday: Lower body\n• Thursday: Rest or active recovery\n• Friday: Full body or upper\n• Saturday: HIIT + mobility\n• Sunday: Complete rest\n\nStart with 3 days, add more as you adapt!",
+                    
+                    "**Training Frequency Science**\n\n**Muscle Protein Synthesis (MPS):**\n• Elevated for 24-48 hours post-workout\n• Training a muscle 2x weekly = 2x MPS spikes\n• More frequency = more growth stimulus\n\n**Volume Distribution:**\n• 10-20 sets per muscle per week optimal\n• Distribute across 2-3 sessions\n• Example: Chest - Monday 8 sets, Thursday 8 sets\n\n**Frequency by Experience:**\n\n**Beginner (0-1 year):**\n• 3-4 days sufficient\n• Full body each session\n• Focus: Learn movements\n\n**Intermediate (1-3 years):**\n• 4-5 days optimal\n• Upper/lower or push/pull/legs\n• Focus: Progressive overload\n\n**Advanced (3+ years):**\n• 5-6 days possible\n• Sophisticated splits\n• Focus: Weak point training\n\n**Overtraining Signs:**\n⚠️ Decreased performance\n⚠️ Persistent fatigue\n⚠️ Sleep disruption\n⚠️ Elevated resting heart rate\n⚠️ Mood changes\n\nMore isn't always better - find YOUR optimal frequency!"
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // Nutrition with meal examples
+            if (q.includes('eat') || q.includes('meal') || q.includes('food') || q.includes('nutrition') || q.includes('diet plan')) {
+                const responses = [
+                    "**Complete Nutrition Guide**\n\n**Macro Breakdown by Goal:**\n\n**Muscle Building (2,500 cal example):**\n• Protein: 180g (720 cal, 29%)\n• Carbs: 325g (1,300 cal, 52%)\n• Fats: 55g (495 cal, 19%)\n\n**Fat Loss (1,800 cal example):**\n• Protein: 160g (640 cal, 36%)\n• Carbs: 180g (720 cal, 40%)\n• Fats: 50g (450 cal, 24%)\n\n**Sample Day (Muscle Building):**\n\n**Breakfast (7 AM):**\n• 3 whole eggs + 2 egg whites\n• 80g oats with berries\n• 1 banana\n• Black coffee\n*Macros: 40g P, 70g C, 18g F*\n\n**Snack (10 AM):**\n• Greek yogurt (200g)\n• 30g almonds\n*Macros: 25g P, 20g C, 15g F*\n\n**Lunch (1 PM):**\n• 180g chicken breast\n• 200g sweet potato\n• Mixed vegetables\n• 1 tbsp olive oil\n*Macros: 45g P, 80g C, 12g F*\n\n**Pre-Workout (4 PM):**\n• Rice cakes with honey\n• 1 apple\n*Macros: 5g P, 50g C, 1g F*\n\n**Post-Workout (6:30 PM):**\n• Protein shake: 40g whey\n• 1 banana\n*Macros: 40g P, 35g C, 2g F*\n\n**Dinner (8 PM):**\n• 200g salmon\n• 150g quinoa\n• Roasted vegetables\n• Avocado (half)\n*Macros: 50g P, 70g C, 22g F*\n\n**Hydration:** 3-4L water throughout day\n\n**Supplements:**\n✓ Creatine: 5g with post-workout\n✓ Vitamin D: 2000 IU daily\n✓ Omega-3: 2g daily",
+                    
+                    "**Meal Timing & Nutrient Timing**\n\n**Pre-Workout Nutrition (2-3 hours before):**\n\nGoal: Fuel performance, prevent fatigue\n• Carbs: 0.5-1g per kg bodyweight\n• Protein: 20-30g\n• Low fiber, low fat (digest quickly)\n\n**Options:**\n• Oatmeal + protein powder + banana\n• White rice + chicken + vegetables\n• Rice cakes + peanut butter + honey\n\n**Intra-Workout (60+ min sessions):**\n• 30-60g carbs (dextrose/maltodextrin)\n• 5-10g BCAAs (optional)\n• Electrolytes if sweating heavily\n\n**Post-Workout (Within 2 hours):**\n\nGoal: Recovery, muscle protein synthesis\n• Protein: 0.3-0.5g per kg (20-40g)\n• Carbs: 0.5-1g per kg (replenish glycogen)\n• Fast-digesting preferred\n\n**Options:**\n• Protein shake + rice cakes + fruit\n• Chicken + white rice + vegetables\n• Greek yogurt + granola + berries\n\n**General Meal Structure:**\n\n**Every Meal Should Include:**\n✓ Protein source (palm-sized)\n✓ Colorful vegetables (2 fists)\n✓ Complex carb (cupped hand)\n✓ Healthy fat (thumb-sized)\n\n**Meal Frequency:**\n• 3-6 meals daily (personal preference)\n• Protein every 3-5 hours optimal\n• Total daily intake > meal timing\n\n**Hydration Strategy:**\n• Wake up: 500ml water\n• With meals: 250-500ml\n• During workout: 500-1000ml\n• Throughout day: Sip continuously\n• Total: 3-4L daily minimum\n\nConsistency > perfection. One meal won't make or break progress!"
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // Cardio with specific protocols
+            if (q.includes('cardio') || q.includes('running') || q.includes('endurance') || q.includes('hiit')) {
+                const responses = [
+                    "**Cardio Training Protocols**\n\n**LISS (Low-Intensity Steady State):**\n• Duration: 30-60 minutes\n• Intensity: 60-70% max heart rate\n• Frequency: 3-5x weekly\n• Examples: Walking, cycling, swimming\n• Best for: Fat loss, recovery, beginners\n• Calories: 200-400 per session\n\n**MISS (Moderate-Intensity):**\n• Duration: 20-40 minutes\n• Intensity: 70-80% max heart rate\n• Frequency: 3-4x weekly\n• Examples: Jogging, rowing, elliptical\n• Best for: Cardiovascular fitness\n• Calories: 300-500 per session\n\n**HIIT (High-Intensity Interval):**\n• Duration: 15-25 minutes\n• Work: 30-60 seconds at 85-95% max HR\n• Rest: 1-2x work interval\n• Frequency: 2-3x weekly\n• Examples: Sprints, bike intervals, burpees\n• Best for: Time-efficient fat loss, fitness\n• Calories: 250-400 per session\n\n**Sample HIIT Workout:**\n• Warm-up: 5 min easy\n• Intervals: 30s sprint / 90s walk (8 rounds)\n• Cool-down: 5 min easy\n• Total: 22 minutes\n\n**Sample LISS Workout:**\n• 45-minute brisk walk\n• Heart rate: 120-130 BPM\n• Morning on empty stomach (optional)\n\n**Which to Choose?**\n• Fat loss: LISS + HIIT combination\n• Endurance: MISS primarily\n• Time-restricted: HIIT 2-3x weekly\n• Recovery: LISS daily\n\n**Pro Tips:**\n✓ Don't do HIIT daily (recovery needed)\n✓ LISS doesn't interfere with strength\n✓ Track heart rate for intensity\n✓ Progressive overload applies to cardio too\n\nFind what you enjoy - adherence > optimization!",
+                    
+                    "**Advanced Cardio Strategies**\n\n**Concurrent Training (Cardio + Weights):**\n\n**Option 1: Separate Days**\n• Weights: Mon, Wed, Fri\n• Cardio: Tue, Thu, Sat\n• Benefit: Maximum performance both\n\n**Option 2: Same Day (AM/PM Split)**\n• AM: Weights (prioritized)\n• PM: Cardio (4-6 hours later)\n• Benefit: More recovery between sessions\n\n**Option 3: Same Session**\n• Weights first (15-45 min)\n• Then cardio (15-20 min)\n• Benefit: Time-efficient\n\n**Cardio for Different Goals:**\n\n**Maximum Fat Loss:**\n• Morning fasted walk: 30-45 min (5-6x weekly)\n• Post-workout HIIT: 15 min (2-3x weekly)\n• Daily steps: 10,000+\n• Total weekly: 200-300 min\n\n**Muscle Building:**\n• LISS only: 20-30 min (2-3x weekly)\n• Keep intensity low\n• Focus: Recovery, heart health\n• Total weekly: 60-90 min\n\n**Athletic Performance:**\n• Sport-specific intervals: 2-3x weekly\n• Tempo runs: 1x weekly\n• LISS recovery: 2x weekly\n• Total weekly: 120-180 min\n\n**Interference Effect:**\n⚠️ Excessive cardio + weights = reduced muscle growth\n✓ Keep cardio moderate if building muscle\n✓ Adequate nutrition prevents interference\n✓ 3-4 sessions weekly is sweet spot\n\n**Heart Rate Zones:**\n• Zone 1 (50-60%): Recovery\n• Zone 2 (60-70%): Fat burning\n• Zone 3 (70-80%): Aerobic fitness\n• Zone 4 (80-90%): Threshold training\n• Zone 5 (90-100%): Max effort\n\nBalance is key - don't neglect either!"
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // Recovery with detailed protocols
+            if (q.includes('rest') || q.includes('recover') || q.includes('sore') || q.includes('pain') || q.includes('sleep')) {
+                const responses = [
+                    "**Complete Recovery Protocol**\n\n**Sleep Optimization:**\n• Target: 7-9 hours nightly\n• Consistency: Same bedtime/wake time\n• Environment: Dark, cool (18-20°C), quiet\n• Pre-sleep routine: No screens 1 hour before\n• Supplements: Magnesium 400mg, melatonin 0.5-3mg\n\n**Sleep Stages for Athletes:**\n• Deep sleep: Muscle repair, growth hormone release\n• REM sleep: Cognitive recovery, skill consolidation\n• Need both: Don't sacrifice sleep for training!\n\n**Active Recovery Days:**\n\n**Light Activities:**\n• 20-30 min walk or easy cycling\n• Yoga or stretching routine\n• Swimming (low intensity)\n• Mobility work\n\n**Benefits:**\n✓ Increases blood flow to muscles\n✓ Reduces stiffness\n✓ Mental break from intense training\n✓ Maintains movement patterns\n\n**Managing Muscle Soreness (DOMS):**\n\n**Day 1-2 Post-Workout:**\n• Light movement (walking)\n• Foam rolling: 10-15 min\n• Gentle stretching\n• Hot/cold contrast therapy\n\n**Day 3-4:**\n• Gradually increase activity\n• Light training same muscle group OK\n• Continue mobility work\n\n**When to Worry:**\n⚠️ Sharp, localized pain\n⚠️ Pain lasting >7 days\n⚠️ Swelling or bruising\n⚠️ Limited range of motion\n→ See a professional!\n\n**Nutrition for Recovery:**\n• Protein: 1.6-2.2g per kg daily\n• Carbs: Replenish glycogen (3-5g per kg)\n• Hydration: 3-4L water daily\n• Anti-inflammatories: Omega-3, turmeric, tart cherry\n\n**Weekly Schedule Example:**\n• Mon: Upper body\n• Tue: Lower body\n• Wed: Active recovery\n• Thu: Upper body\n• Fri: Lower body\n• Sat: Cardio or active recovery\n• Sun: Complete rest\n\nRecovery IS training. Prioritize it!",
+                    
+                    "**Advanced Recovery Techniques**\n\n**Periodized Recovery:**\n\n**Daily Recovery:**\n• Post-workout: Protein + carbs within 2 hours\n• Evening: Light walk (10-15 min)\n• Night: 7-9 hours sleep\n• Throughout: Hydration (3-4L)\n\n**Weekly Recovery:**\n• 1-2 complete rest days\n• 1 active recovery session\n• Foam rolling: 3-4x weekly\n• Stretching: Daily (10 min minimum)\n\n**Monthly Recovery:**\n• Deload week every 4-6 weeks\n• Reduce volume by 40-50%\n• Maintain intensity\n• Focus on technique\n\n**Quarterly Recovery:**\n• 1-2 week break from gym\n• Active lifestyle maintained\n• Mental reset\n• Addresses nagging issues\n\n**Recovery Modalities (Evidence-Based):**\n\n**Highly Effective:**\n✓ Sleep (most important!)\n✓ Adequate nutrition\n✓ Progressive overload management\n✓ Stress management\n\n**Moderately Effective:**\n✓ Massage (weekly)\n✓ Foam rolling\n✓ Stretching\n✓ Cold water immersion (post-training)\n\n**Limited Evidence:**\n• Compression garments\n• Ice baths (may reduce adaptation)\n• TENS units\n• Infrared saunas\n\n**Central Nervous System (CNS) Recovery:**\n\n**High CNS Stress:**\n• Heavy squats, deadlifts (>85% 1RM)\n• Olympic lifts\n• Max effort sprints\n• Competitive sports\n\n**Recovery Needed:**\n• 48-72 hours between heavy sessions\n• Avoid consecutive high-CNS days\n• Adequate carbs (brain fuel)\n• Stress management crucial\n\n**Signs of Overtraining:**\n⚠️ Persistent fatigue despite rest\n⚠️ Strength plateau or decrease\n⚠️ Elevated resting heart rate (+5-10 bpm)\n⚠️ Mood disturbances\n⚠️ Frequent illness\n⚠️ Insomnia or poor sleep\n⚠️ Loss of motivation\n\n**If Overtrained:**\n1. Take 7-14 days complete rest\n2. Evaluate training volume/intensity\n3. Assess life stress factors\n4. Improve sleep and nutrition\n5. Gradually return to training\n\nRest is not weakness - it's strategic!"
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // Motivation with actionable strategies
+            if (q.includes('motivat') || q.includes('consistent') || q.includes('start') || q.includes('begin') || q.includes('discipline')) {
+                const responses = [
+                    "**Building Unbreakable Consistency**\n\n**Phase 1: Foundation (Weeks 1-4)**\n\n**Start Ridiculously Small:**\n• Week 1: Just show up to gym (even 15 min)\n• Week 2: Complete one exercise\n• Week 3: Full 30-min workout\n• Week 4: Maintain 3x weekly\n\n**Why?** Success builds momentum. Small wins → confidence → bigger wins.\n\n**Phase 2: Habit Formation (Weeks 5-12)**\n\n**Implementation Intentions:**\n• \"When X happens, I will Y\"\n• Example: \"After morning coffee, I will workout\"\n• Example: \"On Monday at 6 PM, I go to the gym\"\n\n**Environment Design:**\n✓ Gym bag packed night before\n✓ Workout clothes laid out\n✓ Pre-workout prepared\n✓ Remove barriers (gym near work/home)\n\n**Habit Stacking:**\n• Link new habit to existing one\n• \"After brushing teeth, I do 10 push-ups\"\n• \"After lunch, I walk for 15 min\"\n\n**Phase 3: Identity Shift (Weeks 13+)**\n\n**From \"I want to workout\" to \"I AM someone who works out\"**\n\n**Evidence-Based Strategies:**\n• Every workout = vote for fit identity\n• Track workouts (visual proof)\n• Tell others your identity\n• Dress the part\n• Join fitness communities\n\n**Motivation vs Discipline:**\n\n**Motivation:**\n• Temporary emotional state\n• Unreliable long-term\n• Influenced by mood/energy\n\n**Discipline:**\n• Deliberate action regardless of feeling\n• Built through repetition\n• Independent of emotion\n\n**Building Discipline:**\n1. Set non-negotiable minimum (e.g., 3x weekly)\n2. Schedule it like a meeting\n3. No decision-making on workout day\n4. Show up even if \"not feeling it\"\n5. Something > nothing always\n\n**The 2-Minute Rule:**\n• Can't do 60 min? Do 10 min.\n• Can't do heavy weights? Do bodyweight.\n• Can't do gym? Do home workout.\n• Can't workout? Just stretch.\n\nBreaking the zero is what matters!\n\n**Accountability Systems:**\n✓ Workout partner (social commitment)\n✓ Public declaration (Instagram, friends)\n✓ Betting app (financial stake)\n✓ Coach/trainer (external pressure)\n✓ GetFit streak tracker (gamification)\n\n**Dealing with Setbacks:**\n• Missed 1 day? Not a problem.\n• Missed 2 days? Get back ASAP.\n• Missed 1 week? Restart with easier version.\n\n**Rule:** Never miss twice in a row.\n\n**Long-term Success:**\n✓ Focus on process, not outcome\n✓ Celebrate small wins\n✓ Track non-scale victories\n✓ Find activities you genuinely enjoy\n✓ Remember your WHY\n\nYou don't need motivation. You need a system! 🔥",
+                    
+                    "**Mental Game Mastery**\n\n**Your Brain on Exercise:**\n\n**Immediate Benefits:**\n• Dopamine surge (reward chemical)\n• Endorphins (natural high)\n• Reduced cortisol (stress hormone)\n• Improved focus for 2-3 hours post-workout\n\n**Long-term Benefits:**\n• Neuroplasticity (brain adaptability)\n• Increased BDNF (brain growth factor)\n• Better sleep quality\n• Reduced anxiety and depression\n• Improved self-efficacy\n\n**Psychological Techniques:**\n\n**1. Goal Setting Framework:**\n\n**Outcome Goals (What you want):**\n• \"Lose 10kg\"\n• \"Bench 100kg\"\n• \"Run 5K under 25 min\"\n\n**Process Goals (How to get there):**\n• \"Train 4x weekly\"\n• \"Hit protein target daily\"\n• \"Sleep 8 hours nightly\"\n\n**Focus 80% on process, 20% on outcome.**\n\n**2. Visualization:**\n• Close eyes before workout\n• Visualize completing it successfully\n• Imagine how you'll feel after\n• See yourself as strong, capable\n• 3-5 minutes daily\n\n**3. Self-Talk Reframe:**\n\n**Negative → Positive:**\n❌ \"I have to workout\" → ✅ \"I GET to workout\"\n❌ \"This is hard\" → ✅ \"This is making me stronger\"\n❌ \"I'm tired\" → ✅ \"I'm pushing my limits\"\n❌ \"I might fail\" → ✅ \"I'm learning and growing\"\n\n**4. The 5-Second Rule:**\n• When you feel resistance, count: 5-4-3-2-1\n• Then physically move\n• Interrupt overthinking\n• Build action bias\n\n**5. Identity-Based Habits:**\n\n**Questions to ask:**\n• \"What would a fit person do right now?\"\n• \"How would my ideal self handle this?\"\n• \"What choice aligns with who I want to be?\"\n\n**Common Mental Barriers:**\n\n**\"I don't have time\"**\n→ You have time. It's about priorities. We find time for what matters.\n\n**\"I'm too tired\"**\n→ Exercise creates energy. Start with 10 min. You'll feel better.\n\n**\"I'll start Monday\"**\n→ Start today. Right now. Even 5 minutes counts.\n\n**\"I'm not seeing results\"**\n→ Results take time. Trust the process. Track non-scale wins.\n\n**\"I'm not motivated\"**\n→ Motivation follows action. Act first, feeling follows.\n\n**Creating Intrinsic Motivation:**\n\n**External (Short-term):**\n• Look good for event\n• Impress others\n• Win competition\n\n**Internal (Sustainable):**\n• Feel strong and capable\n• Stress management\n• Health and longevity\n• Personal growth\n• Daily energy\n\n**Shift focus to intrinsic for lasting change.**\n\n**The Compound Effect:**\n• 1% better daily = 37x better yearly\n• Small actions compound\n• Consistency > intensity\n• Time is your friend\n\n**Your Fitness Journey:**\n• Month 1: Uncomfortable, building habit\n• Month 2: Seeing small changes, gaining confidence\n• Month 3: Habit forming, enjoying process\n• Month 6: Noticeable results, identity shift\n• Year 1: Completely transformed, unrecognizable\n\nYou're not just changing your body. You're becoming a different person. That takes time. Be patient. Trust the process. You've got this! 💪"
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            // Supplements
+            if (q.includes('supplement') || q.includes('protein powder') || q.includes('creatine') || q.includes('vitamins')) {
+                return "**Evidence-Based Supplement Guide**\n\n**TIER 1: Proven Effective**\n\n**Creatine Monohydrate:**\n• Dose: 5g daily (timing doesn't matter)\n• Benefits: +5-15% strength, +2-5% muscle mass, cognitive benefits\n• Loading: Optional (20g/day for 5-7 days)\n• Cost: ~$20 for 100 days\n• Safety: Most researched supplement, very safe\n• Who: Everyone (especially vegetarians)\n\n**Protein Powder:**\n• Dose: Fill gaps (target 1.6-2.2g/kg total daily)\n• Types: Whey (fast), casein (slow), plant-based (vegans)\n• Timing: Convenient, not magical\n• Cost: ~$1-2 per serving\n• Who: Those struggling to hit protein targets\n\n**Caffeine:**\n• Dose: 3-6mg per kg bodyweight (pre-workout)\n• Benefits: +3-5% strength, improved focus, fat oxidation\n• Timing: 30-60 min before training\n• Tolerance: Cycle off occasionally\n• Sources: Coffee, pre-workout, caffeine pills\n\n**TIER 2: Helpful for Some**\n\n**Omega-3 (Fish Oil):**\n• Dose: 2-3g EPA+DHA daily\n• Benefits: Heart health, inflammation reduction, joint health\n• Who: Those not eating fatty fish 2-3x weekly\n\n**Vitamin D:**\n• Dose: 2000-4000 IU daily\n• Benefits: Bone health, immune function, mood\n• Who: Those with limited sun exposure\n\n**Multivitamin:**\n• Quality brand with methylated B vitamins\n• Insurance policy for micronutrient gaps\n• Not a replacement for whole foods\n\n**TIER 3: Context-Dependent**\n\n**BCAAs:**\n• Skip if eating enough protein (200g+)\n• Potentially useful: Fasted training\n• Otherwise: Waste of money\n\n**Pre-Workout:**\n• Effective ingredients: Caffeine, citrulline, beta-alanine\n• Avoid: Proprietary blends, excessive stimulants\n• Can make your own cheaper\n\n**Beta-Alanine:**\n• Dose: 3-5g daily\n• Benefits: Improved endurance in 60-240 sec efforts\n• Side effect: Harmless tingling\n\n**Citrulline Malate:**\n• Dose: 6-8g pre-workout\n• Benefits: Improved blood flow, reduced fatigue\n• Better than arginine\n\n**AVOID/WASTE OF MONEY:**\n❌ Fat burners (mostly caffeine + marketing)\n❌ Testosterone boosters (don't work naturally)\n❌ Mass gainers (just eat food)\n❌ CLA (minimal effects)\n❌ Glutamine (unnecessary if eating protein)\n❌ Most \"proprietary blends\"\n\n**Priority Order:**\n1. Dial in whole food nutrition\n2. Add protein powder if needed\n3. Add creatine monohydrate\n4. Consider caffeine (coffee works)\n5. Add Vitamin D and Omega-3 if deficient\n6. Everything else is optional\n\n**Budget Supplement Stack:**\n• Creatine monohydrate: $20/100 days\n• Protein powder: $50/month\n• Caffeine: Coffee $10/month\n• **Total: $75/month**\n\n**The Truth:**\nSupplements are ~5% of results. Focus 95% effort on training, nutrition, sleep, consistency. Don't use supplements to fix a bad diet!";
+            }
+            
+            // Injuries and pain
+            if (q.includes('injury') || q.includes('hurt') || q.includes('painful') || q.includes('shoulder') || q.includes('back') || q.includes('knee')) {
+                return "**Injury Prevention & Management**\n\n**STOP IMMEDIATELY IF:**\n🚨 Sharp, stabbing pain\n🚨 Pain that worsens with movement\n🚨 Swelling or visible deformity\n🚨 Numbness or tingling\n🚨 Loss of range of motion\n→ **See a medical professional immediately!**\n\n**Common Issues & Solutions:**\n\n**Lower Back Pain:**\n• Likely cause: Poor bracing, rounding under load\n• Fix: Master bracing (big breath, brace core)\n• Exercises: McGill Big 3 (bird dog, side plank, curl-up)\n• Avoid: Excessive flexion under load\n• Deload: Reduce weight by 40-50% temporarily\n\n**Shoulder Pain:**\n• Likely cause: Internal rotation, poor scapular control\n• Fix: Face pulls, band pull-aparts, YTWs\n• Exercises: Rotator cuff work 2-3x weekly\n• Avoid: Excessive pressing without balance\n• Ratio: 2 pulls for every 1 push\n\n**Knee Pain:**\n• Likely cause: Valgus collapse, weak VMO, poor ankle mobility\n• Fix: Knee-over-toe progression, terminal knee extensions\n• Exercises: Peterson step-ups, ATG split squats\n• Avoid: Letting knees cave inward\n• Strengthen: Glutes, VMO, hip external rotators\n\n**Elbow Pain (Golfer's/Tennis Elbow):**\n• Likely cause: Overuse, poor wrist/forearm strength\n• Fix: Eccentric wrist curls, flexbar exercises\n• Rest: Reduce volume temporarily\n• Avoid: Excessive gripping exercises\n\n**Prevention Strategies:**\n\n**1. Proper Warm-up (10-15 min):**\n• General: 5 min light cardio\n• Dynamic stretching: Leg swings, arm circles\n• Specific: Light sets of workout exercises\n• Activation: Target weak areas\n\n**2. Progressive Overload:**\n• Increase weight by 2.5-5kg weekly (not daily!)\n• Don't ego lift\n• Deload every 4-6 weeks\n• Listen to body signals\n\n**3. Technique Over Weight:**\n• Master form with light weight first\n• Use full range of motion\n• Control eccentric (lowering) phase\n• Don't sacrifice form for reps/weight\n\n**4. Prehab Work:**\n• Rotator cuff: 2x weekly\n• Core: 3x weekly\n• Hip flexors/glutes: 2x weekly\n• Ankle mobility: Daily\n\n**5. Recovery:**\n• Sleep: 7-9 hours\n• Nutrition: Adequate protein, calories\n• Stress management\n• Active recovery days\n\n**Returning from Injury:**\n\n**Week 1-2: Pain-Free Movement**\n• Range of motion exercises\n• No loading\n• Focus: Blood flow, healing\n\n**Week 3-4: Light Loading**\n• Start at 30-40% previous weight\n• High reps (15-20)\n• Pain-free only\n\n**Week 5-8: Progressive Loading**\n• Increase 5-10% weekly\n• Monitor pain levels (should stay 0-2/10)\n• Build back strength gradually\n\n**Week 9+: Return to Normal**\n• Back to regular programming\n• Continue prehab work\n• Maintain mobility\n\n**Pain Scale Guide:**\n• 0: No pain (good!)\n• 1-2: Mild discomfort (OK to continue)\n• 3-4: Moderate pain (reduce load)\n• 5+: Significant pain (stop immediately)\n\n**Remember:** Pain is your body's warning system. Don't ignore it. Smart training beats tough training every time!";
+            }
+            
+            // Default comprehensive response
+            return "**Personalized Fitness Guidance**\n\n**Based on your question, here's a comprehensive approach:**\n\n**Training Foundation:**\n• Frequency: 3-5x weekly (start lower, build up)\n• Structure: Full body (beginners) or split (intermediate+)\n• Progressive overload: Add weight/reps weekly\n• Form first: Master technique before adding load\n\n**Nutrition Essentials:**\n• Protein: 1.6-2.2g per kg bodyweight\n• Calories: +200-500 for muscle, -300-500 for fat loss\n• Hydration: 3-4L water daily\n• Whole foods: 80% of diet minimum\n• Meal timing: Less important than daily totals\n\n**Recovery Protocol:**\n• Sleep: 7-9 hours nightly (non-negotiable)\n• Rest days: 1-2 weekly minimum\n• Active recovery: Light walks, yoga, stretching\n• Deload: Every 4-6 weeks (reduce volume 40-50%)\n• Listen to body: Persistent fatigue = back off\n\n**Mindset & Consistency:**\n• Focus on process, not just outcomes\n• Start small, build sustainable habits\n• Track progress (photos, measurements, strength)\n• Find activities you enjoy\n• Celebrate small wins\n• Be patient - real change takes 3-6 months\n\n**Common Mistakes to Avoid:**\n❌ Trying to do everything at once\n❌ Changing routine too frequently\n❌ Under-eating protein\n❌ Neglecting sleep\n❌ Comparing to others\n❌ All-or-nothing mindset\n\n**Next Steps:**\n1. Set one specific, measurable goal\n2. Create a simple, sustainable plan\n3. Start this week (don't wait for Monday)\n4. Track your progress\n5. Adjust based on results after 2-3 weeks\n\n**For more specific guidance, ask about:**\n• Building muscle\n• Losing fat\n• Workout programs\n• Meal planning\n• Supplements\n• Injury prevention\n• Cardio protocols\n• Motivation strategies\n\nRemember: Consistency beats perfection. The best program is the one you can stick to long-term. You've got this! 💪";
+        }
+        
+        // Fallback for when API fails
+        function getFallbackResponse(question) {
+            return getEnhancedResponse(question);
+        }
+
+        // Confetti Celebration Function
+        function triggerConfetti() {
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
+            const confettiCount = 100;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti-particle';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.top = '-10px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3500);
+                }, i * 30);
+            }
+        }
+        
+        // Goal Celebration
+        function celebrateGoalsCompleted() {
+            if (allGoalsCompletedToday) return; // Don't celebrate multiple times
+            
+            allGoalsCompletedToday = true;
+            triggerConfetti();
+            
+            // Create celebration modal
+            const celebration = document.createElement('div');
+            celebration.className = 'goal-celebration';
+            celebration.innerHTML = `
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+                <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 1rem; color: white;">
+                    All Goals Completed!
+                </h2>
+                <p style="font-size: 1.2rem; color: rgba(255,255,255,0.9); margin-bottom: 2rem;">
+                    Amazing work! You crushed all your goals today! 💪
+                </p>
+                <button onclick="this.parentElement.remove()" 
+                    style="background: linear-gradient(135deg, #32D74B 0%, #00D9FF 100%); 
+                           color: black; padding: 1rem 2rem; border: none; border-radius: 1rem; 
+                           font-weight: 700; cursor: pointer; font-size: 1.1rem;">
+                    Awesome! 🚀
+                </button>
+            `;
+            document.body.appendChild(celebration);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (celebration.parentElement) {
+                    celebration.remove();
+                }
+            }, 10000);
+            
+            showToast('🎉 Goals Completed!', 'You are on fire today! All goals accomplished!', 'success', 5000);
+        }
+        
+        // Check if all goals are completed
+        function checkGoalsCompletion() {
+            const waterCompleted = dailyGoals.water.current >= dailyGoals.water.goal;
+            const sleepCompleted = dailyGoals.sleep.current >= dailyGoals.sleep.goal;
+            const stepsCompleted = dailyGoals.steps.current >= dailyGoals.steps.goal;
+            
+            dailyGoals.water.completed = waterCompleted;
+            dailyGoals.sleep.completed = sleepCompleted;
+            dailyGoals.steps.completed = stepsCompleted;
+            
+            // Update checkmarks
+            document.getElementById('water-checkmark').innerHTML = waterCompleted ? '<span class="goal-completed-checkmark"></span>' : '';
+            document.getElementById('sleep-checkmark').innerHTML = sleepCompleted ? '<span class="goal-completed-checkmark"></span>' : '';
+            document.getElementById('steps-checkmark').innerHTML = stepsCompleted ? '<span class="goal-completed-checkmark"></span>' : '';
+            
+            // Update indicator
+            const completedCount = [waterCompleted, sleepCompleted, stepsCompleted].filter(Boolean).length;
+            document.getElementById('goals-completed-indicator').innerHTML = 
+                `<span style="color: var(--color-accent);">${completedCount}/3 Completed</span>`;
+            
+            // Trigger celebration if all completed
+            if (waterCompleted && sleepCompleted && stepsCompleted && !allGoalsCompletedToday) {
+                celebrateGoalsCompleted();
+            }
+        }
+        
+        // Update goals UI
+        function updateGoalsUI() {
+            // Water
+            document.getElementById('water-current').textContent = dailyGoals.water.current.toFixed(1);
+            const waterPercent = (dailyGoals.water.current / dailyGoals.water.goal) * 100;
+            document.getElementById('water-progress').style.width = Math.min(waterPercent, 100) + '%';
+            
+            // Sleep
+            const sleepHours = Math.floor(dailyGoals.sleep.current);
+            const sleepMinutes = Math.round((dailyGoals.sleep.current - sleepHours) * 60);
+            document.getElementById('sleep-current').textContent = sleepHours;
+            document.getElementById('sleep-minutes').textContent = sleepMinutes;
+            
+            // Steps (sync with userStats)
+            document.getElementById('steps-current').textContent = dailyGoals.steps.current.toLocaleString();
+            const stepsPercent = (dailyGoals.steps.current / dailyGoals.steps.goal) * 100;
+            document.getElementById('steps-goal-progress').style.width = Math.min(stepsPercent, 100) + '%';
+            
+            checkGoalsCompletion();
+            
+            // Reinitialize icons after UI update
+            setTimeout(() => window.createIcons?.(), 50);
+        }
+        
+        function addWater() {
+            dailyGoals.water.current += 0.25;
+            waterIntake = dailyGoals.water.current;
+            updateGoalsUI();
+            showToast('Water Added! 💧', `Great! You have logged 250ml. Total today: ${waterIntake.toFixed(1)}L`, 'success', 2500);
+        }
+
+        function logSleep() {
+            const hours = prompt('How many hours did you sleep?', '8');
+            if (hours && !isNaN(hours)) {
+                const sleepHours = parseFloat(hours);
+                dailyGoals.sleep.current = sleepHours;
+                updateGoalsUI();
+                
+                if (sleepHours >= 7) {
+                    showToast('Sleep Logged! 😴', `${sleepHours} hours - Excellent! Quality sleep is key to recovery.`, 'success', 3000);
+                } else {
+                    showToast('Sleep Logged 💤', `${sleepHours} hours - Try to get more rest tonight!`, 'warning', 3000);
+                }
+            }
+        }
+
+        function setWorkoutTab(tab) {
+            const tabs = ['workout-library-tab', 'workout-routines-tab', 'workout-history-tab'];
+            tabs.forEach(t => document.getElementById(t).classList.add('hidden'));
+            document.getElementById(tab).classList.remove('hidden');
+            
+            document.querySelectorAll('.workout-tab').forEach(t => {
+                t.classList.remove('border-green-500');
+                t.classList.add('text-gray-400');
+                t.style.color = '';
+            });
+            event.target.classList.add('border-green-500');
+            event.target.classList.remove('text-gray-400');
+            event.target.style.color = 'var(--color-accent)';
+            
+            // Load content based on tab
+            if (tab === 'workout-routines-tab') {
+                displayRoutines();
+            } else if (tab === 'workout-history-tab') {
+                displayHistory();
+            }
+        }
+        
+        function displayRoutines() {
+            const html = myRoutines.length > 0 ? myRoutines.map(r => `
+                <div class="p-4 rounded-xl" style="background-color: var(--color-card);">
+                    <h3 class="font-semibold text-lg">${r.name}</h3>
+                    <p class="text-sm text-gray-400 mt-1">${r.workouts.join(', ')}</p>
+                    <div class="flex items-center justify-between mt-3">
+                        <span class="text-sm text-gray-400">${r.duration} min • Created ${r.created}</span>
+                        <button onclick="startRoutine(${r.id})" class="px-4 py-2 rounded-lg text-black font-semibold text-sm" style="background-color: var(--color-accent);">
+                            Start
+                        </button>
+                    </div>
+                </div>
+            `).join('') : '<p class="text-center text-gray-400 py-12 col-span-2">No custom routines yet. Create one!</p>';
+            
+            document.getElementById('routines-list').innerHTML = html;
+        }
+        
+        function displayHistory() {
+            const html = workoutHistory.map(h => `
+                <div class="p-4 rounded-xl flex items-center justify-between" style="background-color: var(--color-card);">
+                    <div>
+                        <h3 class="font-semibold">${h.name}</h3>
+                        <p class="text-sm text-gray-400">${h.date} • ${h.duration} min • ${h.calories} cal</p>
+                    </div>
+                    <button onclick="repeatWorkout('${h.name}')" class="px-4 py-2 rounded-lg border border-gray-600 text-sm font-semibold hover:bg-gray-700">
+                        Repeat
+                    </button>
+                </div>
+            `).join('');
+            
+            document.getElementById('history-list').innerHTML = html;
+        }
+        
+        function createNewRoutine() {
+            const name = prompt('Enter routine name:');
+            if (name) {
+                showModal('Routine Creation 🏋️', `Creating "${name}"! Select workouts from the library to build your custom routine.`, 'info');
+            }
+        }
+        
+        async function startRoutine(id) {
+            const routine = myRoutines.find(r => r.id === id);
+            const confirmed = await showConfirm(
+                'Start Routine? 🏋️', 
+                `${routine.name}\nTotal duration: ${routine.duration} minutes\n\nWorkouts:\n${routine.workouts.join(', ')}`,
+                'Start Now',
+                'Cancel'
+            );
+            if (confirmed) {
+                showToast('Routine Started! 💪', `${routine.name} - Let's do this!`, 'success', 3000);
+            }
+        }
+        
+        async function repeatWorkout(name) {
+            const confirmed = await showConfirm('Repeat Workout? 🔄', `Ready to do ${name} again?`, 'Start Workout', 'Cancel');
+            if (confirmed) {
+                showToast('Workout Started! 🔥', `${name} - Time to sweat!`, 'success', 3000);
+            }
+        }
+        
+        // Social Features
+        function searchFriends() {
+            const query = document.getElementById('friend-search').value.toLowerCase();
+            if (!query) {
+                showToast('Search Required', 'Please enter a name or username to search', 'warning', 2500);
+                return;
+            }
+            
+            const results = availableFriends.filter(f => 
+                !friends.some(friend => friend.id === f.id) &&
+                (f.name.toLowerCase().includes(query) || f.username.toLowerCase().includes(query))
+            );
+            
+            if (results.length === 0) {
+                document.getElementById('friend-search-results').innerHTML = '<p class="text-gray-400 text-sm">No users found</p>';
+                return;
+            }
+            
+            const html = results.map(u => `
+                <div class="flex items-center justify-between p-3 rounded-lg bg-gray-700">
+                    <div class="flex items-center">
+                        <img src="${u.image}" alt="${u.name}" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <h4 class="font-semibold">${u.name}</h4>
+                            <p class="text-xs text-gray-400">@${u.username} • ${u.workouts} workouts</p>
+                        </div>
+                    </div>
+                    <button onclick="addFriend(${u.id})" class="px-4 py-1 rounded-lg text-black font-semibold text-sm" style="background-color: var(--color-accent);">
+                        Add Friend
+                    </button>
+                </div>
+            `).join('');
+            
+            document.getElementById('friend-search-results').innerHTML = html;
+        }
+        
+        function addFriend(id) {
+            const friend = availableFriends.find(f => f.id === id);
+            if (friend && !friends.some(f => f.id === id)) {
+                friends.push(friend);
+                displayFriends();
+                searchFriends(); // Refresh search results
+                showToast('Friend Added! 👥', `${friend.name} is now your friend!`, 'success', 3000);
+            }
+        }
+        
+        async function removeFriend(id) {
+            const confirmed = await showConfirm('Remove Friend?', 'Are you sure you want to remove this friend?', 'Remove', 'Cancel');
+            if (confirmed) {
+                const friend = friends.find(f => f.id === id);
+                friends = friends.filter(f => f.id !== id);
+                displayFriends();
+                showToast('Friend Removed', `${friend?.name || 'Friend'} has been removed`, 'info', 2500);
+            }
+        }
+        
+        function displayFriends() {
+            document.getElementById('friends-count').textContent = friends.length;
+            
+            if (friends.length === 0) {
+                document.getElementById('friends-list').innerHTML = '<p class="text-gray-400 text-sm">No friends yet. Search and add friends above!</p>';
+                return;
+            }
+            
+            const html = friends.map(f => `
+                <div class="flex items-center justify-between p-3 rounded-lg bg-gray-700">
+                    <div class="flex items-center">
+                        <img src="${f.image}" alt="${f.name}" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <h4 class="font-semibold">${f.name}</h4>
+                            <p class="text-xs text-gray-400">@${f.username} • ${f.workouts} workouts</p>
+                        </div>
+                    </div>
+                    <button onclick="removeFriend(${f.id})" class="px-4 py-1 rounded-lg border border-gray-600 text-sm font-semibold hover:bg-gray-600">
+                        Remove
+                    </button>
+                </div>
+            `).join('');
+            
+            document.getElementById('friends-list').innerHTML = html;
+        }
+        
+        function likePost(btn) {
+            const currentLikes = parseInt(btn.textContent.match(/\d+/)[0]);
+            btn.textContent = `❤️ ${currentLikes + 1}`;
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+        }
+
+        function filterWorkouts(category) {
+            currentFilter = category;
+            
+            // Update filter buttons styling
+            document.querySelectorAll('.workout-filter').forEach(btn => {
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+                btn.classList.add('border', 'border-gray-500', 'text-gray-300');
+                btn.classList.remove('text-black');
+            });
+            
+            // Highlight active filter button
+            const activeBtn = Array.from(document.querySelectorAll('.workout-filter')).find(
+                btn => btn.textContent.trim() === category
+            );
+            if (activeBtn) {
+                activeBtn.style.backgroundColor = 'var(--color-accent)';
+                activeBtn.style.color = 'black';
+                activeBtn.classList.remove('border', 'border-gray-500', 'text-gray-300');
+                activeBtn.classList.add('text-black');
+            }
+            
+            displayWorkouts();
+            
+            // Scroll to workout list smoothly
+            document.getElementById('workout-list').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function displayWorkouts() {
+            const filtered = currentFilter === 'All' 
+                ? workouts 
+                : workouts.filter(w => w.level === currentFilter || w.category === currentFilter);
+            
+            if (filtered.length === 0) {
+                document.getElementById('workout-list').innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <p class="text-gray-400 text-lg">No workouts found for "${currentFilter}"</p>
+                        <button onclick="filterWorkouts('All')" class="mt-4 px-6 py-2 rounded-lg text-black font-semibold" style="background-color: var(--color-accent);">
+                            View All Workouts
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = filtered.map(w => `
+                <div class="rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition" style="background-color: var(--color-card);" onclick="startWorkout(${w.id})">
+                    <img src="${w.image}" alt="${w.name}" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs px-2 py-1 rounded-full bg-gray-700">${w.level}</span>
+                            <span class="text-xs text-gray-400">${w.category}</span>
+                        </div>
+                        <h3 class="font-semibold mt-2">${w.name}</h3>
+                        <div class="flex items-center justify-between mt-2">
+                            <p class="text-sm text-gray-400">
+                                <i data-lucide="clock" class="w-3 h-3 inline"></i> ${w.duration} min
+                            </p>
+                            <p class="text-sm text-gray-400">
+                                <i data-lucide="flame" class="w-3 h-3 inline"></i> ${w.calories} cal
+                            </p>
+                        </div>
+                        <button class="mt-3 w-full py-2 rounded-lg text-black font-semibold flex items-center justify-center" style="background-color: var(--color-accent);">
+                            <i data-lucide="play" class="w-4 h-4 mr-2"></i> Start Workout
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('workout-list').innerHTML = html;
+            setTimeout(() => window.createIcons?.(), 100);
+        }
+
+        async function startWorkout(id) {
+            const workout = workouts.find(w => w.id === id);
+            if (!workout) return;
+            
+            const message = `Duration: ${workout.duration} minutes | Calories: ${workout.calories} cal\nLevel: ${workout.level} | Category: ${workout.category}`;
+            
+            const confirmed = await showConfirm(
+                `Start ${workout.name}? 🏋️`,
+                message,
+                'Start Workout',
+                'Cancel'
+            );
+            
+            if (confirmed) {
+                // Show workout timer/player
+                showModal(
+                    `${workout.name} Started! 💪`,
+                    `Timer: ${workout.duration}:00 minutes\nGet ready to crush this workout!\n\n(Full workout player with timer, exercises, and rest periods coming soon!)`,
+                    'success'
+                );
+                      
+                // Add to history (prepend to beginning)
+                workoutHistory.unshift({
+                    name: workout.name,
+                    date: 'Just now',
+                    duration: workout.duration,
+                    calories: workout.calories
+                });
+                
+                // Keep only last 10 workouts
+                if (workoutHistory.length > 10) {
+                    workoutHistory.pop();
+                }
+                
+                // Update stats in Firestore if user is logged in
+                if (currentUser) {
+                    await updateUserStats({
+                        workouts: 1,
+                        calories: workout.calories,
+                        steps: Math.floor(workout.duration * 100) // Approximate steps based on duration
+                    });
+                    showToast('Stats Updated! 📊', 'Your progress has been saved', 'success', 2500);
+                }
+            }
+        }
+
+        // Interactive stat card functions
+        async function showCaloriesDetail() {
+            const calories = userStats.totalCalories || 0;
+            const message = `
+                <div style="text-align: left;">
+                    <p style="font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 1rem;">
+                        ${calories.toLocaleString()} <span style="font-size: 1.2rem; color: #888;">cal</span>
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        Calories are tracked automatically when you complete workouts. Every workout counts!
+                    </p>
+                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                        <p style="font-size: 0.9rem; color: #aaa;">
+                            💡 <strong>Tip:</strong> Complete workouts from the Workout section to increase your calorie burn!
+                        </p>
+                    </div>
+                </div>
+            `;
+            await showModal('Calories Burned 🔥', message, 'info');
+        }
+        
+        async function showStepsDetail() {
+            const steps = userStats.totalSteps || 0;
+            const goal = dailyGoals.steps.goal;
+            const remaining = Math.max(0, goal - steps);
+            const percent = Math.min((steps / goal) * 100, 100).toFixed(1);
+            
+            const message = `
+                <div style="text-align: left;">
+                    <p style="font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 1rem;">
+                        ${steps.toLocaleString()} <span style="font-size: 1.2rem; color: #888;">steps</span>
+                    </p>
+                    <div style="background: #1a1a1a; border-radius: 1rem; padding: 0.5rem; margin-bottom: 1rem;">
+                        <div style="background: linear-gradient(135deg, #32D74B 0%, #00D9FF 100%); height: 0.5rem; border-radius: 1rem; width: ${percent}%;"></div>
+                    </div>
+                    <p style="text-align: center; margin-bottom: 1rem; font-size: 1.1rem;">
+                        ${remaining > 0 ? `${remaining.toLocaleString()} steps to go! (${percent}%)` : '🎉 Goal reached! Amazing work!'}
+                    </p>
+                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                        <p style="font-size: 0.9rem; color: #aaa;">
+                            💡 <strong>Tip:</strong> Steps are added automatically when you complete workouts. Keep moving!
+                        </p>
+                        <button onclick="addTestSteps()" style="margin-top: 0.5rem; background: var(--color-accent); color: black; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                            ➕ Add 1000 Steps (Test)
+                        </button>
+                    </div>
+                </div>
+            `;
+            await showModal('Steps Tracker 👣', message, 'info');
+        }
+        
+        async function showWorkoutsDetail() {
+            const workouts = userStats.totalWorkouts || 0;
+            const calories = userStats.totalCalories || 0;
+            
+            const message = `
+                <div style="text-align: left;">
+                    <p style="font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 1rem;">
+                        ${workouts} <span style="font-size: 1.2rem; color: #888;">workouts</span>
+                    </p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+                            <p style="font-size: 0.8rem; color: #888; margin-bottom: 0.5rem;">Calories Burned</p>
+                            <p style="font-size: 1.5rem; font-weight: 700;">${calories.toLocaleString()}</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+                            <p style="font-size: 0.8rem; color: #888; margin-bottom: 0.5rem;">Avg. per Workout</p>
+                            <p style="font-size: 1.5rem; font-weight: 700;">${workouts > 0 ? Math.round(calories / workouts) : 0}</p>
+                        </div>
+                    </div>
+                    <p style="text-align: center;">
+                        ${workouts === 0 ? '🎯 Start your first workout today!' : '💪 Amazing progress! Keep crushing it!'}
+                    </p>
+                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                        <p style="font-size: 0.9rem; color: #aaa;">
+                            💡 <strong>Tip:</strong> Browse the Workout library and start a new workout to increase this counter!
+                        </p>
+                    </div>
+                </div>
+            `;
+            await showModal('Workouts Done 💪', message, 'success');
+        }
+        
+        async function showStreakDetail() {
+            const streak = userStats.currentStreak || 0;
+            const longest = userStats.longestStreak || 0;
+            
+            const message = `
+                <div style="text-align: left;">
+                    <p style="font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 1rem;">
+                        ${streak} <span style="font-size: 1.2rem; color: #888;">days</span>
+                    </p>
+                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                        <p style="font-size: 0.9rem; color: #aaa; text-align: center;">
+                            🏆 Longest Streak: <strong>${longest} days</strong>
+                        </p>
+                    </div>
+                    <p style="text-align: center; margin-bottom: 1rem;">
+                        ${streak > 0 ? '🔥 Keep the momentum going! Don\'t break the streak!' : '🎯 Start your streak today! Complete any workout to begin.'}
+                    </p>
+                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                        <p style="font-size: 0.9rem; color: #aaa;">
+                            💡 <strong>How it works:</strong> Your streak increases by 1 for each consecutive day you complete at least one workout. Keep showing up!
+                        </p>
+                    </div>
+                </div>
+            `;
+            await showModal('Active Streak 🔥', message, 'info');
+        }
+        
+        // Test function to add steps manually
+        async function addTestSteps() {
+            const stepsToAdd = 1000;
+            if (currentUser) {
+                await updateUserStats({
+                    steps: stepsToAdd
+                });
+            } else {
+                userStats.totalSteps = (userStats.totalSteps || 0) + stepsToAdd;
+                updateDashboardStats();
+            }
+            showToast('Steps Added! 👟', `Added ${stepsToAdd.toLocaleString()} steps to your total!`, 'success', 2500);
+            
+            // Close modal and reopen with updated stats
+            document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
+            setTimeout(() => showStepsDetail(), 300);
+        }
+        
+        // Test function to trigger celebration
+        function testCelebration() {
+            // Temporarily complete all goals
+            const originalAllGoalsCompleted = allGoalsCompletedToday;
+            allGoalsCompletedToday = false; // Reset to allow celebration
+            
+            dailyGoals.water.current = dailyGoals.water.goal;
+            dailyGoals.sleep.current = dailyGoals.sleep.goal;
+            dailyGoals.steps.current = dailyGoals.steps.goal;
+            
+            updateGoalsUI();
+            
+            showToast('Test Mode', 'All goals marked as completed for testing!', 'info', 2000);
+        }
+        
+        // Update user stats in Firestore
+        async function updateUserStats(updates) {
+            if (!currentUser) return;
+            
+            try {
+                const userRef = window.firestoreDoc(window.firebaseDb, 'users', currentUser.uid);
+                const userSnap = await window.firestoreGetDoc(userRef);
+                
+                if (userSnap.exists()) {
+                    const currentStats = userSnap.data().stats || {};
+                    const newStats = {
+                        totalWorkouts: (currentStats.totalWorkouts || 0) + (updates.workouts || 0),
+                        totalCalories: (currentStats.totalCalories || 0) + (updates.calories || 0),
+                        totalSteps: (currentStats.totalSteps || 0) + (updates.steps || 0),
+                        currentStreak: currentStats.currentStreak || 0,
+                        longestStreak: currentStats.longestStreak || 0
+                    };
+                    
+                    await window.firestoreUpdateDoc(userRef, { stats: newStats });
+                    userStats = newStats;
+                    updateDashboardStats();
+                }
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+        
+        
+        // Authentication state listener
+        function initAuth() {
+            if (window.firebaseOnAuthStateChanged && window.firebaseAuth) {
+                window.firebaseOnAuthStateChanged(window.firebaseAuth, async (user) => {
+                    if (user) {
+                        currentUser = user;
+                        await loadUserData(user.uid);
+                        console.log('User authenticated:', user.email);
+                    } else {
+                        currentUser = null;
+                        console.log('No user authenticated');
+                    }
+                });
+            }
+        }
+        
+        // Initialize
+        setTimeout(() => {
+            window.createIcons?.();
+            displayWorkouts();
+            displayFriends();
+            initAuth();
+            updateGoalsUI();
+            
+            // Reinitialize icons periodically to ensure they all show
+            setInterval(() => {
+                window.createIcons?.();
+            }, 2000);
+        }, 100);
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+Folder PATH listing
+Volume serial number is 00000071 B491:16F0
+C:\USERS\DELL\DESKTOP\HYTEL BOOTCAMP\SRC
+|   App.tsx
+|   main.tsx
+|   vite-env.d.ts
+|   
++---api
+|   +---firebase
+|   |       config.ts
+|   |       
+|   \---trpc
++---assets
+|   +---icons
+|   \---images
++---components
+|   +---common
+|   |       Button.tsx
+|   |       
+|   +---features
+|   |   +---auth
+|   |   +---nutrition
+|   |   +---progress
+|   |   \---workout
+|   \---layout
+|           Header.tsx
+|           
++---contexts
++---hooks
+|       useLocalStorage.ts
+|       
++---lib
++---pages
++---styles
+|       App.css
+|       index.css
+|       
++---types
+|       index.ts
+|       
+\---utils
+        constants.ts
+        helpers.ts
+        

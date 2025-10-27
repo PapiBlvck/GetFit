@@ -1,0 +1,487 @@
+## GetFit Fitness App — Business Model Canvas
+
+### Customer Segments
+- **Health & Fitness Enthusiasts**: Performance tracking for weightlifting, running, yoga, sleep, GPS.
+- **Casual Users/Beginners**: Simple habit formation, basic logging, goal setting, motivation.
+- **Corporate Wellness Programs**: Employers purchasing bulk access and reporting.
+
+### Value Propositions
+- **Unified Tracking**: Centralized logging for steps, distance, weightlifting, yoga, sleep, GPS routes.
+- **Smart, Personalized Coaching**: AI-driven daily/weekly goal adjustments and nutrition guidance.
+- **Motivation & Community**: Challenges, leaderboards, social features, gamified progress.
+- **Seamless Device Integration**: Works with popular wearables for HR and sleep data.
+
+### Channels
+- **Mobile App Stores**: iOS App Store, Google Play Store (primary distribution).
+- **Content Marketing/SEO**: Blog, videos on fitness, training, nutrition.
+- **Social Media Ads**: Targeted campaigns by interest and behavior.
+- **Partnerships**: Device manufacturers and corporate wellness vendors.
+
+### Customer Relationships
+- **Personalized Feedback Loop**: In-app AI coach provides daily encouragement and adjustments.
+- **In-App Community**: UGC, mutual motivation, group challenges.
+- **Premium Support**: Priority support for subscribers and enterprise admins.
+
+### Revenue Streams
+- **Subscription Tiers**:
+  - Basic (Free): Core tracking, limited history, ads.
+  - Pro (Monthly/Annual): Advanced charts/trends, goal setting, workout logging, no ads.
+  - Premium (Monthly/Annual): AI coaching, advanced nutrition/health insights, social leaderboards, exclusive content.
+- **Corporate Licensing**: Annual fee per employee seat and reporting add-ons.
+- **Affiliate Marketing**: Non-intrusive sponsored gear recommendations.
+
+### Key Resources
+- **AI/ML Models**: Personalized coaching and predictive insights.
+- **Activity & Nutrition Database**: Validated calorie burn rates, workout library, nutritional data.
+- **Engineering Team**: Mobile, backend, data, security expertise.
+- **Device Integration APIs/SDKs**: Apple Health, Google Fit, Fitbit, Garmin.
+
+### Key Activities
+- **Data Sync & Processing**: Reliable, near real-time ingestion from wearables.
+- **Algorithm Development**: Train and refine AI coaching and goal-setting logic.
+- **Content Creation**: Guided workouts, yoga sessions, health articles.
+- **Community Management**: Moderation, events, challenge curation.
+
+### Key Partnerships
+- **Wearable Manufacturers**: Garmin, Apple Health, Google Fit, Fitbit.
+- **Nutrition/Recipe Platforms**: For enriched meal logging data.
+- **Health Content Providers**: Accredited trainers, dieticians.
+- **GPS Mapping Services**: Accurate route tracking and elevation.
+
+### Cost Structure
+- **Cloud Hosting & Storage**: Time-series data (steps, GPS, HR) at scale.
+- **Salaries**: Engineering, AI/Data Science, Content, Support.
+- **Marketing & Acquisition**: PPC, paid social, ASO.
+- **Third-party APIs**: Maps, Health integrations, analytics.
+
+---
+
+## Suggested Project Folder Structure
+
+```
+getfit/
+  README.md
+  LICENSE
+  .gitignore
+  .env.example
+
+  app/
+    mobile/
+      android/
+      ios/
+      src/
+        app/
+          navigation/
+          theming/
+          state/
+        features/
+          auth/
+          onboarding/
+          tracking/           # steps, HR, sleep, GPS routes
+          workouts/           # logging, plans, PRs
+          coaching/           # AI coach, goals engine
+          nutrition/          # meals, macros, insights
+          community/          # challenges, leaderboards, feed
+          profile/
+          subscriptions/      # plans, billing UI
+          devices/            # wearables integration UI
+        shared/
+          components/
+          hooks/
+          utils/
+          assets/
+
+    backend/
+      services/
+        api/
+          src/
+            controllers/
+            routes/
+            services/
+            models/
+            middlewares/
+            validators/
+            lib/
+          tests/
+          package.json
+        workers/
+          jobs/
+          queues/
+          package.json
+      infra/
+        db/
+          migrations/
+          seeds/
+          prisma/             # or orm of choice
+        scripts/
+        docker/
+
+    data-science/
+      notebooks/
+      models/
+      pipelines/
+      datasets/
+
+    content/
+      workouts/
+      articles/
+      nutrition/
+
+    analytics/
+      dbt/
+      dashboards/
+      events/
+
+    partners/
+      apple-health/
+      google-fit/
+      fitbit/
+      garmin/
+
+    docs/
+      product/
+      architecture/
+      api/
+      security/
+
+    ops/
+      ci-cd/
+      terraform/
+      k8s/
+      monitoring/
+      alerting/
+
+    qa/
+      test-plans/
+      test-data/
+
+    security/
+      threat-model/
+      policies/
+      pentest-reports/
+```
+
+### Notes on Structure
+- Keep domain features isolated under `app/mobile/src/features` for clear ownership and scaling.
+- Separate `backend/services/api` and `backend/services/workers` for request/response vs. async workloads.
+- `data-science` stays decoupled; ship models to `backend` via versioned artifacts.
+- `partners` holds integration-specific docs, mock data, and test harnesses.
+
+### Optional PowerShell bootstrap script
+Use this to scaffold the directories quickly on Windows PowerShell. Run from the parent directory where you want `getfit/` to live.
+
+```powershell
+$root = "getfit"
+$paths = @(
+  "$root",
+  "$root/app/mobile/src/app/navigation",
+  "$root/app/mobile/src/app/theming",
+  "$root/app/mobile/src/app/state",
+  "$root/app/mobile/src/features/auth",
+  "$root/app/mobile/src/features/onboarding",
+  "$root/app/mobile/src/features/tracking",
+  "$root/app/mobile/src/features/workouts",
+  "$root/app/mobile/src/features/coaching",
+  "$root/app/mobile/src/features/nutrition",
+  "$root/app/mobile/src/features/community",
+  "$root/app/mobile/src/features/profile",
+  "$root/app/mobile/src/features/subscriptions",
+  "$root/app/mobile/src/features/devices",
+  "$root/app/mobile/src/shared/components",
+  "$root/app/mobile/src/shared/hooks",
+  "$root/app/mobile/src/shared/utils",
+  "$root/app/mobile/src/shared/assets",
+  "$root/app/backend/services/api/src/controllers",
+  "$root/app/backend/services/api/src/routes",
+  "$root/app/backend/services/api/src/services",
+  "$root/app/backend/services/api/src/models",
+  "$root/app/backend/services/api/src/middlewares",
+  "$root/app/backend/services/api/src/validators",
+  "$root/app/backend/services/api/src/lib",
+  "$root/app/backend/services/api/tests",
+  "$root/app/backend/services/workers/jobs",
+  "$root/app/backend/services/workers/queues",
+  "$root/app/backend/infra/db/migrations",
+  "$root/app/backend/infra/db/seeds",
+  "$root/app/backend/infra/db/prisma",
+  "$root/app/backend/infra/scripts",
+  "$root/app/backend/infra/docker",
+  "$root/app/data-science/notebooks",
+  "$root/app/data-science/models",
+  "$root/app/data-science/pipelines",
+  "$root/app/data-science/datasets",
+  "$root/app/content/workouts",
+  "$root/app/content/articles",
+  "$root/app/content/nutrition",
+  "$root/app/analytics/dbt",
+  "$root/app/analytics/dashboards",
+  "$root/app/analytics/events",
+  "$root/app/partners/apple-health",
+  "$root/app/partners/google-fit",
+  "$root/app/partners/fitbit",
+  "$root/app/partners/garmin",
+  "$root/app/docs/product",
+  "$root/app/docs/architecture",
+  "$root/app/docs/api",
+  "$root/app/docs/security",
+  "$root/app/ops/ci-cd",
+  "$root/app/ops/terraform",
+  "$root/app/ops/k8s",
+  "$root/app/ops/monitoring",
+  "$root/app/ops/alerting",
+  "$root/app/qa/test-plans",
+  "$root/app/qa/test-data",
+  "$root/app/security/threat-model",
+  "$root/app/security/policies",
+  "$root/app/security/pentest-reports"
+)
+foreach ($p in $paths) { New-Item -ItemType Directory -Force -Path $p | Out-Null }
+"Initialized folder structure under $root"
+```
+
+### Next Steps
+- Prioritize MVP features: tracking, coaching basics, subscriptions, device sync.
+- Define events taxonomy in `analytics/events` and baseline dashboards.
+- Draft API contracts in `docs/api` and set up CI/CD in `ops/ci-cd`.
+
+---
+
+## Technical Design Document (TDD): GetFit Fitness Tracker
+
+### 1. Overview
+- **One-liner**: GetFit is an all-in-one fitness platform with AI-driven coaching and seamless wearable integration.
+- **Goal**: Unify fragmented fitness data across activity, workouts, nutrition, and sleep in one platform.
+- **Key Features**: Activity tracking, workout logging, GPS routes, HR/sleep monitoring, goals, progress visuals, AI coaching, social challenges.
+- **Success Criteria**: 7-day retention > 30% (goal set + 7 days of logging). MAU growth > 10%.
+
+### 2. Tech Stack (Golden Path)
+- **Runtime**: Node on Firebase Gen 2 Cloud Functions
+- **Language**: TypeScript (strict)
+- **Front-end**: React Native (mobile); React + Vite (admin web)
+- **UI kit**: NativeBase or React Native Paper
+- **Styling**: Tailwind via NativeWind (RN)
+- **State / data fetching**: TanStack Query
+- **Forms & validation**: React Hook Form + Zod resolver
+- **Shared validation**: Zod (client & server)
+- **API**: tRPC (typed RPC)
+- **Backend**: Firebase Auth, Firestore, Cloud Storage, Cloud Functions
+- **AI/ML**: Vertex AI (coaching inference)
+- **Mono**: PNPM workspaces; Turborepo (remote cache)
+- **Workshop**: Storybook
+- **Tests**: Vitest + Testing Library; E2E via Detox (mobile) and Playwright (web)
+- **Lint/Format**: ESLint (typescript-eslint, perfectionist) + Prettier
+- **Env**: T3 Env (Zod-validated)
+- **Versioning**: Changesets
+- **CI/CD**: GitHub Actions (Turbo-aware)
+
+### 3. Monorepo Layout (PNPM)
+```
+.
+├── apps/
+│   ├── mobile/
+│   └── web/
+├── functions/
+├── packages/
+│   ├── shared/
+│   ├── health-data-schemas/
+│   └── seeding/
+└── docs/
+```
+Alignment: mirrors the earlier project folder structure; `apps` for UIs, `functions` for API/cron/AI, `packages` for shared code.
+
+### 4. Architecture
+- **Client**: RN app uses tRPC client over HTTPS to Cloud Functions. TanStack Query handles caching/invalidations.
+- **Auth**: Firebase Auth (email/password, OAuth). ID token attached to tRPC requests via headers.
+- **API Gate**: tRPC routers deployed as HTTPS Cloud Functions (region colocation with Firestore).
+- **Data**: Firestore for documents; Cloud Storage for large route files (GeoJSON). Daily aggregates for time-series.
+- **AI**: Vertex AI endpoint for coaching. Advice generated daily via scheduled Function and cached per-user/day.
+- **Events**: Analytics events emitted client-side (screen, action) and server-side (mutations) to BigQuery (optional future) or GA4.
+
+Request flow (example: log activity):
+1) Client validates input with Zod → 2) tRPC mutation (auth checked) → 3) Firestore write (ActivityLog + optional sub-doc) → 4) Enqueue async aggregation (if needed) → 5) Invalidate client cache.
+
+### 5. Data Model (Firestore)
+- `users/{uid}`: uid, email, role, settings.units, target_goals.current, device_ids
+- `activityLogs/{id}`: userId, type, date, duration, calories_burned, source
+- `workoutSessions/{id}`: logId, exercises[], total_sets, total_reps, notes
+- `timeSeries/{userId}/{date}`: data_type: HR|Sleep|Weight, value: array of points
+- `routes/{id}`: logId, start_time, end_time, geojson_path (Cloud Storage URL)
+- `goals/{id}`: userId, type, target_value, current_value, status
+- `challenges/{id}`: name, type, participants[], leaderboard_data
+
+Indexes: composite on `(userId, date)` and `(userId, type, date)`.
+Security: users can only access their data; public challenges are read-only except submissions by members.
+
+#### Representative Zod Schemas (packages/health-data-schemas)
+```ts
+import { z } from "zod";
+
+export const ActivityLogSchema = z.object({
+  userId: z.string().min(1),
+  type: z.enum(["steps","workout","yoga","run","cycle","swim"]),
+  date: z.string(), // ISO date
+  duration: z.number().int().nonnegative().optional(),
+  calories_burned: z.number().nonnegative().optional(),
+  source: z.enum(["manual","device"]).default("manual"),
+});
+export type ActivityLog = z.infer<typeof ActivityLogSchema>;
+
+export const WorkoutSessionSchema = z.object({
+  logId: z.string().min(1),
+  exercises: z.array(z.object({
+    name: z.string(),
+    sets: z.number().int().positive(),
+    reps: z.number().int().positive().optional(),
+    weightKg: z.number().nonnegative().optional(),
+  })),
+  total_sets: z.number().int().nonnegative(),
+  total_reps: z.number().int().nonnegative().optional(),
+  notes: z.string().max(1000).optional(),
+});
+
+export const TimeSeriesPointSchema = z.object({ t: z.number(), v: z.number() });
+export const TimeSeriesSchema = z.object({
+  userId: z.string(),
+  date: z.string(),
+  data_type: z.enum(["HR","Sleep","Weight"]),
+  value: z.array(TimeSeriesPointSchema),
+});
+
+export const GoalSchema = z.object({
+  userId: z.string(),
+  type: z.enum(["Daily","Weekly","Steps","Calories"]),
+  target_value: z.number().nonnegative(),
+  current_value: z.number().nonnegative().default(0),
+  status: z.enum(["active","completed","paused"]).default("active"),
+});
+```
+
+### 6. API Design (tRPC routers in functions)
+- `activity.logActivity(input: ActivityLogSchema) -> ActivityLog`
+- `activity.getDailySummary(input: { date: string }) -> { steps: number; calories: number; workouts: number }`
+- `goals.updateGoal(input: { goalId: string; new_target: number }) -> Goal`
+- `progress.getTimeSeriesData(input: { dataType: string; startDate: string; endDate: string }) -> TimeSeries[]`
+- `ai.getCoachingAdvice(input: { userId: string; current_week_data: unknown }) -> string`
+- `social.joinChallenge(input: { challengeId: string }) -> Challenge`
+
+```ts
+// example: activity router (functions/src/routers/activity.ts)
+export const activityRouter = t.router({
+  logActivity: t.procedure
+    .input(ActivityLogSchema)
+    .mutation(async ({ ctx, input }) => {
+      const uid = ctx.auth.uid; // verified by middleware
+      if (uid !== input.userId) throw new TRPCError({ code: "FORBIDDEN" });
+      const ref = ctx.db.collection("activityLogs").doc();
+      await ref.set({ ...input, id: ref.id, createdAt: Date.now() });
+      return { id: ref.id, ...input };
+    }),
+});
+```
+
+### 7. Testing Strategy
+- **Unit** (Vitest): Zod schemas, utilities, reducers, tRPC procedures (logic isolated with Firestore emulator or mocks).
+- **Component** (Testing Library): RN components, hooks with React Query providers.
+- **E2E**: Detox (mobile) critical flows: auth, log activity, update goal, view summary. Playwright for admin web.
+- **Contract**: tRPC client/server type coupling + additional runtime Zod on boundaries.
+- **Coverage Goals**: 80% for packages/functions core; critical paths at 95%.
+
+### 8. CI/CD (GitHub Actions)
+- Caching with Turbo + PNPM store. Matrix for node versions if needed.
+- Jobs: lint, typecheck, unit, component, emulator tests; build mobile; deploy functions on main; preview on PRs.
+- Secrets via GitHub Encrypted Secrets; environment via T3 Env.
+
+### 9. Security & Privacy
+- Firebase Security Rules least privilege: per-user doc paths; server-only writes for derived aggregates.
+- Validate all inputs with Zod on client and server; reject extraneous fields.
+- Token verification in tRPC context; role-based gates for admin endpoints.
+- PII minimization; data retention policies; export/delete (GDPR-ready).
+- At-rest encryption (Firestore/Storage) and in-transit (HTTPS). Regular dependency scanning.
+
+### 10. Performance & Scalability
+- Time-series layout: one doc per user per day for HR/GPS summaries; raw paths in Storage. Prevent hot-docs by sharding if needed.
+- Aggregation caching: weekly/monthly stats in separate collection; invalidate on new writes.
+- AI latency: daily scheduled generation and caching of coaching advice; on-demand fallback with timeout and stale-while-revalidate.
+- Read/write budgets monitored; query shapes constrained by composite indexes.
+
+### 11. Observability
+- Structured logs (requestId, userId, router, procedure, duration, status).
+- Metrics: API latency p95, errors, function cold starts, Firestore reads/writes per feature.
+- Traces: wrap tRPC procedures; correlate client actions to server spans.
+- Alerts: error rate spikes, cost anomalies, AI latency SLA breach.
+
+### 12. Rollout Plan
+- Env tiers: dev → staging → prod. Feature flags for AI coaching and social.
+- Phase 1 (MVP): Auth, activity logging, goals, daily summary, basic coaching stub.
+- Phase 2: GPS routes, workouts detail, wearables integration (Apple Health/Google Fit).
+- Phase 3: AI coaching full, challenges/leaderboards, admin web.
+- Data migration scripts in `packages/seeding` and emulator-first development.
+
+### 13. Risks & Mitigations
+- Wearable API changes → vendor abstraction layer and contract tests.
+- Firestore cost growth → aggregation, query audits, cold storage for history.
+- AI hallucinations/quality → human-curated rules, guardrails, offline evaluation.
+- Mobile performance → background sync, pagination, virtualized lists.
+
+### 14. Open Questions
+- Which wearable vendors for MVP? (Apple Health + Google Fit vs Fitbit/Garmin)
+- Scope of admin web in MVP? (Moderation only vs full content tooling)
+- Data residency requirements by target regions?
+
+---
+
+## Evaluation Rubric: Fullstack Web/Mobile App — GetFit Development
+
+Scale: 1 (Unacceptable) → 5 (Exceptional). Use half-points when needed (e.g., 3.5).
+
+### Design (UI/UX)
+- **1**: Inconsistent layout; illegible data; no/poor mobile adaptation.
+- **2**: Basic responsiveness; visual bugs on tracking screens (e.g., charts).
+- **3**: Clean, consistent UI for mobile/web; readable charts; basic a11y checks.
+- **4**: Strong hierarchy; custom theming by fitness level; gesture support (e.g., swipe to log set).
+- **5**: Pixel-perfect, branded; polished motion/interaction; smooth chart transitions; formal a11y audit with fixes.
+
+### Frontend Implementation
+- **1**: Frequent runtime errors; poor HealthKit/Google Fit integration; no state for complex forms.
+- **2**: Core steps tracking works but brittle; slow dashboard initial load.
+- **3**: Modular components; TanStack Query/RHF used; real-time listeners (onSnapshot) for current stats.
+- **4**: Well-typed hooks; perf optimizations (lazy tabs, memo); reliable background sync.
+- **5**: Production-grade: ~0 CLS on dashboards; exhaustive error/empty/loading states; Lighthouse ~90+.
+
+### Backend / API
+- **1**: Missing/failing endpoints; insecure rules; no input validation.
+- **2**: CRUD works; weak error handling; validation gaps (e.g., invalid reps).
+- **3**: tRPC typed routes; Zod validation; security rules isolate user data.
+- **4**: Time-series–optimized models; composite indexes; graceful device sync failure handling.
+- **5**: Multi-env config; seeding scripts (e.g., week of activity); scalable aggregations (weekly totals).
+
+### Data Integrity & Sync
+- **1**: Data loss on sync; inconsistent metrics; basic logs only.
+- **2**: Manual/delayed sync; HR/Sleep structures hard to integrate.
+- **3**: Reliable auto-sync with ≥1 major API; logs include metadata (source, timestamp, units).
+- **4**: Duplicate detection/dedup; rich weightlifting models (sets, reps, RPE) complete.
+- **5**: Zero-loss pipeline; full GPS route storage (GeoJSON in Storage); on-write integrity checks.
+
+### AI & Smart Coaching
+- **1**: No AI; static coaching text.
+- **2**: Threshold-based advice only.
+- **3**: Vertex AI (or similar) integration; advice generated from weekly summary data.
+- **4**: Personalized advice adjusts goals; nutrition macro guidance based on intensity.
+- **5**: Predictive goal adjustments (e.g., +10% next lift); real-time feedback where users rate advice.
+
+### Quality & Testing
+- **1**: No automated tests.
+- **2**: <30% unit; flaky E2E (e.g., workout logging).
+- **3**: ≥60% unit+component; Playwright happy path (Sign-up, Log Workout, View Dashboard); lint/Prettier pass in CI.
+- **4**: Visual regression via Storybook on charts; a11y checks; seeded data resets; ≥80% coverage.
+- **5**: Mutation/property-based tests for core calcs; contract/fuzz tests for sync API; zero-regression policy.
+
+### Scoring Method
+- Compute average across categories. Weighting (optional): Frontend 20%, Backend 20%, Data Sync 20%, AI 15%, Design 15%, Quality 10%.
+- Acceptance thresholds: **MVP** ≥ 3.0 avg with no category < 2.5; **Beta** ≥ 3.8 avg with no category < 3; **Launch** ≥ 4.3 avg with no category < 3.5.
+
+### Milestone Acceptance Checks
+- **M1 – MVP**: Steps logging; goals; daily summary; Firestore rules; CI lint/type/test green; Detox happy path.
+- **M2 – Device Sync**: Google Fit/HealthKit sync; dedup; weekly aggregates; seeded E2E data; dashboards stable (CLS≈0).
+- **M3 – AI Coaching**: Scheduled daily advice from Vertex AI; feedback loop; performance metrics within SLA; a11y audit complete.
+

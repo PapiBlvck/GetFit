@@ -1,0 +1,43 @@
+# GetFit Dependencies - Individual Commands
+
+## Core Dependencies (run one at a time)
+npm install firebase
+npm install zod
+npm install @trpc/server
+npm install @trpc/client
+npm install @trpc/react-query
+npm install @tanstack/react-query
+npm install react
+npm install react-dom
+npm install react-hook-form
+npm install @hookform/resolvers
+
+## Dev Dependencies (run one at a time)
+npm install -D typescript
+npm install -D @types/node
+npm install -D @types/react
+npm install -D @types/react-dom
+npm install -D eslint
+npm install -D prettier
+npm install -D vitest
+npm install -D @testing-library/react
+npm install -D @testing-library/jest-dom
+npm install -D @types/jest
+npm install -D tsx
+
+## Alternative: Smaller batches
+# Batch 1 - Firebase & Validation
+npm install firebase zod react-hook-form @hookform/resolvers
+
+# Batch 2 - tRPC & React Query
+npm install @trpc/server @trpc/client @trpc/react-query @tanstack/react-query
+
+# Batch 3 - React
+npm install react react-dom
+
+# Batch 4 - Dev Tools
+npm install -D typescript @types/node @types/react @types/react-dom
+
+# Batch 5 - Testing & Linting
+npm install -D eslint prettier vitest @testing-library/react @testing-library/jest-dom @types/jest tsx
+
