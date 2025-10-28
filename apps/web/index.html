@@ -1046,13 +1046,7 @@
             animation: spin 1s linear infinite;
         }
         
-        /* ===== SIDEBAR REMOVED - NOW USING FIXED NAVBAR ===== */
-        
-        /* Hide sidebar completely */
-        #sidebar {
-            display: none !important;
-            box-shadow: 4px 0 40px rgba(0, 0, 0, 0.6), inset -1px 0 0 rgba(50, 215, 75, 0.1);
-        }
+        /* ===== USING FIXED TOP NAVBAR ===== */
         
         /* Premium Navigation Links */
         /* Premium Navigation Link Styling */
@@ -3532,21 +3526,15 @@
                 history.pushState(viewName, '', '');
             }
             
-            // Show/hide sidebar based on view and adjust main content styling
-            const sidebar = document.getElementById('corporate-sidebar');
+            // Adjust main content styling based on view
             const mainContent = document.getElementById('main-content');
             const appContainer = document.getElementById('app-container');
             
             if (viewName === 'login' || viewName === 'signup') {
-                // Landing/Auth views: Hide sidebar and add landing-page class to body
+                // Landing/Auth views: Add landing-page class to body
                 document.body.classList.add('landing-page');
                 
-                if (sidebar) {
-                    sidebar.style.display = 'none';
-                }
-                
                 if (appContainer) {
-                    appContainer.style.marginLeft = '0';
                     appContainer.style.paddingTop = '0';
                 }
                 
@@ -3555,19 +3543,13 @@
                     mainContent.style.paddingTop = '0';
                     mainContent.style.background = 'transparent';
                     mainContent.style.backdropFilter = 'none';
-                    console.log('📐 Landing page mode - sidebar hidden');
+                    console.log('📐 Landing page mode');
                 }
             } else {
-                // App views: Show sidebar with scroll-to-hide enabled
+                // App views: Normal styling
                 document.body.classList.remove('landing-page');
                 
-                if (sidebar) {
-                    sidebar.style.display = 'flex';
-                    sidebar.classList.add('sidebar-visible');
-                }
-                
                 if (appContainer) {
-                    appContainer.style.marginLeft = '260px';
                     appContainer.style.paddingTop = '0';
                 }
                 
@@ -3575,11 +3557,11 @@
                     mainContent.style.padding = '2rem';
                     mainContent.style.background = '#f8f9fa';
                     mainContent.style.backdropFilter = 'none';
-                    console.log('📐 App view mode - sidebar visible');
+                    console.log('📐 App view mode');
                 }
             }
             
-            // Update active navigation state in sidebar
+            // Update active navigation state
             const navLinks = document.querySelectorAll('.nav-item');
             navLinks.forEach(link => {
                 link.classList.remove('active');
@@ -7533,12 +7515,8 @@
          * Initialize scroll listener (wrapper for backward compatibility)
          */
         function initScrollListener() {
-            if (!scrollListenerActive) {
-                const sidebar = document.getElementById('corporate-sidebar');
-                if (sidebar && !document.body.classList.contains('landing-page')) {
-                    initScrollToHide(sidebar);
-                }
-            }
+            // Scroll listener functionality removed - navbar is always visible
+            console.log('Scroll listener not needed - navbar always visible');
         }
         
         /**
@@ -7684,12 +7662,7 @@
         // Initialize icons immediately
         window.createIcons?.();
         
-        // Hide sidebar on initial page load (prevents flash before auth state is determined)
-        const sidebar = document.getElementById('corporate-sidebar');
-        if (sidebar) {
-            sidebar.style.display = 'none';
-            console.log('Sidebar hidden on initial page load - waiting for auth state');
-        }
+        // Add landing-page class on initial page load
         document.body.classList.add('landing-page');
         
         // Initialize Firebase Auth - This controls everything
