@@ -111,7 +111,7 @@ service cloud.firestore {
         && request.resource.data.glasses <= 20;
     }
     
-    // ==================== HEALTH METRICS COLLECTION ====================
+    // ==================== HEALTH METRICS COLLECTION (old format) ====================
     match /health_metrics/{metricId} {
       // Users can read their own health metrics
       allow read: if isOwner(resource.data.userId);
@@ -125,6 +125,22 @@ service cloud.firestore {
       
       // Users can delete their own health metrics
       allow delete: if isOwner(resource.data.userId);
+    }
+    
+    // ==================== HEALTH METRICS COLLECTION (new camelCase format) ====================
+    match /healthMetrics/{metricId} {
+      // Document ID format: {userId}-{date} (e.g., "abc123-2025-10-27")
+      // Allow read if the document ID starts with the user's UID
+      allow read: if isAuthenticated() && metricId.matches(request.auth.uid + '-.*');
+      
+      // Allow write (create/update) if:
+      // 1. User is authenticated
+      // 2. Document ID starts with their UID
+      // 3. userId field matches their UID
+      allow write: if isAuthenticated() 
+        && metricId.matches(request.auth.uid + '-.*')
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.date is string;
     }
     
     // ==================== CHALLENGES COLLECTION ====================

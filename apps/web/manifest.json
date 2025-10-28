@@ -1,0 +1,50 @@
+{
+  "name": "GetFit - Fitness Tracker",
+  "short_name": "GetFit",
+  "description": "Track your fitness goals, workouts, nutrition, and health metrics all in one place",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#32D74B",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/public/logo.avif",
+      "sizes": "192x192",
+      "type": "image/avif",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/public/logo.avif",
+      "sizes": "512x512",
+      "type": "image/avif",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "fitness", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Log Workout",
+      "short_name": "Workout",
+      "description": "Quickly log a workout",
+      "url": "/?view=workout",
+      "icons": []
+    },
+    {
+      "name": "Log Meal",
+      "short_name": "Nutrition",
+      "description": "Log your meals",
+      "url": "/?view=nutrition",
+      "icons": []
+    },
+    {
+      "name": "Health Metrics",
+      "short_name": "Health",
+      "description": "Track sleep and water",
+      "url": "/?view=health",
+      "icons": []
+    }
+  ]
+}
+

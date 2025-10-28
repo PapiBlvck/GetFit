@@ -45,43 +45,57 @@ describe('Button Component', () => {
 
   it('should render different variants', () => {
     const { rerender } = render(<Button variant="primary">Primary</Button>);
-    expect(screen.getByText('Primary')).toHaveClass('btn-primary');
+    const button = screen.getByText('Primary');
+    expect(button).toHaveClass('bg-blue-600');
+    expect(button).toHaveClass('text-white');
     
     rerender(<Button variant="secondary">Secondary</Button>);
-    expect(screen.getByText('Secondary')).toHaveClass('btn-secondary');
+    const secondaryButton = screen.getByText('Secondary');
+    expect(secondaryButton).toHaveClass('bg-gray-200');
+    expect(secondaryButton).toHaveClass('text-gray-800');
     
-    rerender(<Button variant="outline">Outline</Button>);
-    expect(screen.getByText('Outline')).toHaveClass('btn-outline');
+    rerender(<Button variant="danger">Danger</Button>);
+    const dangerButton = screen.getByText('Danger');
+    expect(dangerButton).toHaveClass('bg-red-600');
+    expect(dangerButton).toHaveClass('text-white');
   });
 
   it('should render loading state', () => {
     render(<Button isLoading>Loading Button</Button>);
     
-    expect(screen.getByRole('button')).toBeDisabled();
-    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+    const button = screen.getByRole('button');
+    expect(button).toBeDisabled();
+    expect(button).toHaveClass('opacity-50');
+    expect(button).toHaveClass('cursor-not-allowed');
+    expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
   it('should support different sizes', () => {
-    const { rerender } = render(<Button size="sm">Small</Button>);
-    expect(screen.getByText('Small')).toHaveClass('btn-sm');
+    const { rerender } = render(<Button size="small">Small</Button>);
+    const smallButton = screen.getByText('Small');
+    expect(smallButton).toHaveClass('px-3');
+    expect(smallButton).toHaveClass('py-1.5');
+    expect(smallButton).toHaveClass('text-sm');
     
-    rerender(<Button size="md">Medium</Button>);
-    expect(screen.getByText('Medium')).toHaveClass('btn-md');
+    rerender(<Button size="medium">Medium</Button>);
+    const mediumButton = screen.getByText('Medium');
+    expect(mediumButton).toHaveClass('px-4');
+    expect(mediumButton).toHaveClass('py-2');
+    expect(mediumButton).toHaveClass('text-base');
     
-    rerender(<Button size="lg">Large</Button>);
-    expect(screen.getByText('Large')).toHaveClass('btn-lg');
+    rerender(<Button size="large">Large</Button>);
+    const largeButton = screen.getByText('Large');
+    expect(largeButton).toHaveClass('px-6');
+    expect(largeButton).toHaveClass('py-3');
+    expect(largeButton).toHaveClass('text-lg');
   });
 
-  it('should render with icon', () => {
-    const Icon = () => <span data-testid="icon">🔥</span>;
-    render(
-      <Button icon={<Icon />}>
-        With Icon
-      </Button>
-    );
+  it('should apply custom className', () => {
+    render(<Button className="my-custom-class">Custom</Button>);
     
-    expect(screen.getByTestId('icon')).toBeInTheDocument();
-    expect(screen.getByText('With Icon')).toBeInTheDocument();
+    const button = screen.getByText('Custom');
+    expect(button).toHaveClass('my-custom-class');
+    expect(button).toHaveClass('rounded-lg'); // Still has base classes
   });
 });
 

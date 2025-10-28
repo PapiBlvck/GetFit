@@ -10,13 +10,14 @@ describe('Validation Schemas', () => {
   describe('createMealSchema', () => {
     it('should validate a valid meal', () => {
       const validMeal = {
+        type: 'lunch',
         name: 'Chicken Salad',
         calories: 350,
         protein: 30,
         carbs: 20,
         fats: 15,
-        mealType: 'lunch',
         date: '2024-01-15',
+        time: '12:00',
       };
 
       const result = createMealSchema.safeParse(validMeal);
@@ -25,13 +26,14 @@ describe('Validation Schemas', () => {
 
     it('should reject meal with negative calories', () => {
       const invalidMeal = {
+        type: 'lunch',
         name: 'Bad Meal',
         calories: -100,
         protein: 30,
         carbs: 20,
         fats: 15,
-        mealType: 'lunch',
         date: '2024-01-15',
+        time: '12:00',
       };
 
       const result = createMealSchema.safeParse(invalidMeal);
@@ -43,13 +45,14 @@ describe('Validation Schemas', () => {
 
     it('should reject meal with invalid meal type', () => {
       const invalidMeal = {
+        type: 'invalid',
         name: 'Test Meal',
         calories: 300,
         protein: 20,
         carbs: 30,
         fats: 10,
-        mealType: 'invalid',
         date: '2024-01-15',
+        time: '12:00',
       };
 
       const result = createMealSchema.safeParse(invalidMeal);
@@ -58,12 +61,13 @@ describe('Validation Schemas', () => {
 
     it('should require name field', () => {
       const invalidMeal = {
+        type: 'lunch',
         calories: 300,
         protein: 20,
         carbs: 30,
         fats: 10,
-        mealType: 'lunch',
         date: '2024-01-15',
+        time: '12:00',
       };
 
       const result = createMealSchema.safeParse(invalidMeal);

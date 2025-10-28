@@ -9,8 +9,8 @@ test.describe('User Registration and Login Flow', () => {
   test('should complete registration flow', async ({ page }) => {
     await page.goto('/');
 
-    // Click register
-    await page.click('text=Sign Up');
+    // Click register (looking for "Start Blueprint" or "Start Your Kinetic Blueprint")
+    await page.click('button:has-text("Start")');
     
     // Fill registration form
     await page.fill('input[name="email"]', `test${Date.now()}@example.com`);

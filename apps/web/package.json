@@ -1,33 +1,23 @@
 {
-  "name": "getfit-monorepo",
+  "name": "@getfit/web",
   "version": "1.0.0",
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter @getfit/web dev",
-    "dev:web": "pnpm --filter @getfit/web dev",
-    "build": "pnpm -r build",
-    "build:web": "pnpm --filter @getfit/web build",
-    "build:schemas": "pnpm --filter @getfit/shared-schemas build",
-    "build:functions": "pnpm --filter functions build",
-    "test": "pnpm --filter @getfit/web test",
-    "test:ui": "pnpm --filter @getfit/web test:ui",
-    "test:coverage": "pnpm --filter @getfit/web test:coverage",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:all": "pnpm test && pnpm test:e2e",
-    "lint": "pnpm -r lint",
-    "format": "prettier --write \"apps/**/*.{ts,tsx,css}\" \"packages/**/*.{ts,tsx}\" \"functions/**/*.{ts,tsx}\"",
-    "clean": "pnpm -r clean && rm -rf node_modules",
-    "deploy:functions": "pnpm --filter functions deploy",
-    "deploy": "pnpm build && firebase deploy"
+    "dev": "vite --port 3000",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.0",
     "@tanstack/react-query": "^5.0.0",
     "@trpc/client": "^10.45.0",
     "@trpc/react-query": "^10.45.0",
-    "@trpc/server": "^10.45.0",
     "clsx": "^2.1.1",
     "firebase": "^10.0.0",
     "framer-motion": "^12.23.24",
@@ -40,10 +30,8 @@
     "zod": "^3.22.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.0",
     "@testing-library/jest-dom": "^6.0.0",
     "@testing-library/react": "^14.0.0",
-    "@types/jest": "^29.5.0",
     "@types/node": "^24.9.1",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
@@ -56,9 +44,9 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "jsdom": "^23.0.0",
     "prettier": "^3.0.0",
-    "tsx": "^4.0.0",
     "typescript": "^5.9.3",
     "vite": "^5.0.0",
     "vitest": "^1.0.0"
   }
 }
+
