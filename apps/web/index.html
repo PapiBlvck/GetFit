@@ -3882,8 +3882,12 @@
                 await createUserProfile(currentUser.uid, name, email);
                 
                 userName = name;
-                document.getElementById('user-name').textContent = userName;
-                document.getElementById('dashboard-name').textContent = userName;
+                
+                // Update dashboard name if element exists
+                const dashboardNameEl = document.getElementById('dashboard-name');
+                if (dashboardNameEl) {
+                    dashboardNameEl.textContent = userName;
+                }
                 
                 showModal('Welcome to GetFit! 🎉', `Hey ${userName}! Your fitness journey starts now. Let us make every workout count!`, 'success');
                 showView('dashboard');
@@ -4008,9 +4012,11 @@
                         window.nutritionalGoals = userData.nutritionalGoals;
                     }
                     
-                    // Update UI
-                    document.getElementById('user-name').textContent = userName;
-                    document.getElementById('dashboard-name').textContent = userName;
+                    // Update UI safely
+                    const dashboardNameEl = document.getElementById('dashboard-name');
+                    if (dashboardNameEl) {
+                        dashboardNameEl.textContent = userName;
+                    }
                     
                     // Update profile display
                     updateProfileDisplay();
@@ -4031,12 +4037,20 @@
         
         // Update profile display in settings
         function updateProfileDisplay() {
-            document.getElementById('profile-name-display').textContent = userProfile.displayName || '-';
-            document.getElementById('profile-email-display').textContent = userProfile.email || '-';
-            document.getElementById('profile-age-display').textContent = userProfile.age ? `${userProfile.age} years` : '-';
-            document.getElementById('profile-gender-display').textContent = userProfile.gender || '-';
-            document.getElementById('profile-height-display').textContent = userProfile.height ? `${userProfile.height} cm` : '-';
-            document.getElementById('profile-weight-display').textContent = userProfile.weight ? `${userProfile.weight} kg` : '-';
+            // Safely update profile elements if they exist
+            const nameEl = document.getElementById('profile-name-display');
+            const emailEl = document.getElementById('profile-email-display');
+            const ageEl = document.getElementById('profile-age-display');
+            const genderEl = document.getElementById('profile-gender-display');
+            const heightEl = document.getElementById('profile-height-display');
+            const weightEl = document.getElementById('profile-weight-display');
+            
+            if (nameEl) nameEl.textContent = userProfile.displayName || '-';
+            if (emailEl) emailEl.textContent = userProfile.email || '-';
+            if (ageEl) ageEl.textContent = userProfile.age ? `${userProfile.age} years` : '-';
+            if (genderEl) genderEl.textContent = userProfile.gender || '-';
+            if (heightEl) heightEl.textContent = userProfile.height ? `${userProfile.height} cm` : '-';
+            if (weightEl) weightEl.textContent = userProfile.weight ? `${userProfile.weight} kg` : '-';
         }
         
         // Open Edit Profile Modal
