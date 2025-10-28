@@ -98,6 +98,11 @@
         
         body {
             font-family: 'Inter', sans-serif;
+            transition: overflow 0.3s ease;
+        }
+        
+        body.sidebar-open {
+            overflow: hidden;
             background-color: var(--color-primary);
             color: var(--color-text-light);
             margin: 0;
@@ -277,18 +282,126 @@
             font-weight: 600;
         }
 
-        /* Hide old hamburger menu and dropdown */
-        .mobile-menu-toggle,
-        .mobile-nav-dropdown {
-            display: none !important;
+        /* Mobile Hamburger Menu Button */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 32px;
+            height: 32px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 10;
         }
 
+        .mobile-menu-toggle span {
+            width: 100%;
+            height: 3px;
+            background: #00FFF5;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(1) {
+            transform: translateY(10px) rotate(45deg);
+        }
+
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-toggle.active span:nth-child(3) {
+            transform: translateY(-10px) rotate(-45deg);
+        }
+
+        /* Mobile Sidebar */
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(20, 20, 20, 0.98);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(0, 255, 245, 0.1);
+            z-index: 2000;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            padding: 80px 0 20px 0;
+        }
+
+        .mobile-sidebar.active {
+            transform: translateX(0);
+        }
+
+        /* Sidebar Backdrop */
+        .sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1500;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Mobile Sidebar Navigation Items */
         .mobile-nav-item {
-            display: none !important;
+            display: flex !important;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: rgba(174, 174, 178, 1);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
         }
 
-        /* Responsive design - Top nav always visible */
+        .mobile-nav-item:hover {
+            background: rgba(0, 255, 245, 0.1);
+            color: #00FFF5;
+            border-left-color: #00FFF5;
+        }
+
+        .mobile-nav-item.active {
+            background: rgba(0, 255, 245, 0.15);
+            color: #00FFF5;
+            border-left-color: #00FFF5;
+        }
+
+        .mobile-nav-icon {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .mobile-nav-item span {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* Hide horizontal nav links on mobile, show hamburger */
         @media (max-width: 768px) {
+            .mobile-nav-links {
+                display: none !important;
+            }
+
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
             .mobile-top-nav {
                 height: 60px;
                 padding: 0 1rem;
@@ -297,6 +410,42 @@
             #app-container {
                 padding-top: 60px;
             }
+        }
+
+        /* Keep horizontal nav on larger screens */
+        @media (min-width: 769px) {
+            .mobile-sidebar,
+            .sidebar-backdrop {
+                display: none !important;
+            }
+        }
+
+        /* Adjust sidebar width for very small screens */
+        @media (max-width: 480px) {
+            .mobile-sidebar {
+                width: 85vw;
+                max-width: 320px;
+            }
+        }
+
+        /* Smooth scrolling for sidebar */
+        .mobile-sidebar {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Ensure sidebar is above everything */
+        .mobile-sidebar.active,
+        .sidebar-backdrop.active {
+            pointer-events: auto;
+        }
+
+        .mobile-sidebar,
+        .sidebar-backdrop {
+            pointer-events: none;
+        }
+
+        .mobile-sidebar.active {
+            pointer-events: auto;
         }
         
         /* Modern Gradient Cards */
@@ -1601,6 +1750,13 @@
     
     <!-- Top Navigation Bar with Horizontal Links -->
     <nav class="mobile-top-nav">
+        <!-- Hamburger Menu Button (visible only on mobile) -->
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
         <div class="mobile-brand">
             <div class="mobile-brand-icon">GF</div>
             <span class="mobile-brand-name">GetFit</span>
@@ -1673,8 +1829,11 @@
         </a>
     </nav>
 
-    <!-- Mobile Navigation Dropdown -->
-    <div id="mobile-nav-dropdown" class="mobile-nav-dropdown">
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeMobileMenu()"></div>
+
+    <!-- Mobile Sidebar (slides from left on mobile) -->
+    <aside id="mobile-sidebar" class="mobile-sidebar">
         <a href="#" data-view="dashboard" onclick="event.preventDefault(); updateUIState('dashboard-view'); closeMobileMenu();" class="mobile-nav-item active">
             <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
@@ -1739,7 +1898,7 @@
             </svg>
             <span>Logout</span>
         </a>
-    </div>
+    </aside>
     
     <!-- App Container -->
     <div id="app-container" class="flex flex-col" style="min-height: 100vh; padding-top: 0;">
@@ -3528,12 +3687,45 @@
         }
         
         /**
+         * Toggle mobile sidebar menu
+         */
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('mobile-sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const toggleBtn = document.getElementById('mobile-menu-toggle');
+            
+            if (sidebar && backdrop && toggleBtn) {
+                const isActive = sidebar.classList.contains('active');
+                
+                if (isActive) {
+                    // Close menu
+                    sidebar.classList.remove('active');
+                    backdrop.classList.remove('active');
+                    toggleBtn.classList.remove('active');
+                    document.body.classList.remove('sidebar-open');
+                } else {
+                    // Open menu
+                    sidebar.classList.add('active');
+                    backdrop.classList.add('active');
+                    toggleBtn.classList.add('active');
+                    document.body.classList.add('sidebar-open');
+                }
+            }
+        }
+        
+        /**
          * Close mobile navigation menu
          */
         function closeMobileMenu() {
-            const dropdown = document.getElementById('mobile-nav-dropdown');
-            if (dropdown) {
-                dropdown.classList.remove('show');
+            const sidebar = document.getElementById('mobile-sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const toggleBtn = document.getElementById('mobile-menu-toggle');
+            
+            if (sidebar && backdrop && toggleBtn) {
+                sidebar.classList.remove('active');
+                backdrop.classList.remove('active');
+                toggleBtn.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
             }
         }
         
@@ -7931,6 +8123,47 @@
                 window.createIcons?.();
             }, 2000);
         }, 100);
+    </script>
+    
+    <!-- Mobile Sidebar Menu Initialization -->
+    <script>
+        // Initialize mobile sidebar menu on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggleBtn = document.getElementById('mobile-menu-toggle');
+            const sidebar = document.getElementById('mobile-sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            
+            // Toggle menu when hamburger button is clicked
+            if (menuToggleBtn) {
+                menuToggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleMobileMenu();
+                });
+            }
+            
+            // Close menu when backdrop is clicked
+            if (backdrop) {
+                backdrop.addEventListener('click', function() {
+                    closeMobileMenu();
+                });
+            }
+            
+            // Close menu when pressing Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sidebar && sidebar.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            });
+            
+            // Prevent body scroll when sidebar is open
+            if (sidebar) {
+                sidebar.addEventListener('touchmove', function(e) {
+                    e.stopPropagation();
+                }, { passive: true });
+            }
+            
+            console.log('✅ Mobile sidebar menu initialized');
+        });
     </script>
     
     <!-- PWA Service Worker Registration -->
